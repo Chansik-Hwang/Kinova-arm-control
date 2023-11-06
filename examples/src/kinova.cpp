@@ -1,13 +1,13 @@
 //
-// Created by tina on 23. 11. 1.
+// Created by jy on 23. 11. 1.
 //
 
 #include "raisim/RaisimServer.hpp"
 #include "raisim/World.hpp"
+#include "cubicTrajectoryGenerator.hpp"
 
 int main(int argc, char* argv[]) {
     auto binaryPath = raisim::Path::setFromArgv(argv[0]);
-//    raisim::World::setActivationKey(binaryPath.getDirectory() + "\\rsc\\activation.raisim");
 
     /// create raisim world
     raisim::World world;
@@ -17,15 +17,29 @@ int main(int argc, char* argv[]) {
     world.addGround();
     auto kinova = world.addArticulatedSystem("/home/tina/EE3100704/examples/rsc/kinova/urdf/kinova.urdf");
 
+    /// set time
+    double localtime;
+    int timeIteraition;
+    double timedT;
+    localtime = timeIteraition * timedT;
+    timeIteraition++;
+
+    /// create trajectory
+    cubicTrajectoryGenerator trajectoryGenerator;
+
+
     /// kinova joint PD controller
     Eigen::VectorXd jointNominalConfig(kinova->getGeneralizedCoordinateDim()), jointVelocityTarget(kinova->getDOF());
     jointNominalConfig << 0.0, 2.76, -1.57, 0.0, 2.0, 0.0;
     jointVelocityTarget.setZero();
 
+    std::cout<<"mass "<<kinova->getMassMatrix()[0]<<std::endl;
+
     Eigen::VectorXd jointPgain(kinova->getDOF()), jointDgain(kinova->getDOF());
     jointPgain << 40.0, 40.0, 40.0, 15.0, 15.0, 15.0;
     jointDgain << 1.0, 1.0, 1.0, 0.5, 0.5, 0.5;
 
+    /// kinova set torque
     kinova->setGeneralizedCoordinate(jointNominalConfig);
     kinova->setGeneralizedForce(Eigen::VectorXd::Zero(kinova->getDOF()));
     kinova->setPdGains(jointPgain, jointDgain);
@@ -43,7 +57,10 @@ int main(int argc, char* argv[]) {
         server.integrateWorldThreadSafe();
     }
 
-    std::cout<<"mass "<<kinova->getMassMatrix()[0]<<std::endl;
-
     server.killServer();
+}
+
+double getAccelerationTrajectory(double currentTime)
+{
+    return 0;
 }

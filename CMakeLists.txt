@@ -5,6 +5,8 @@ set(RAISIM_PATH "$ENV{HOME}/Library/raisimLib/raisim/linux")
 include_directories(${RAISIM_PATH}/include)
 link_directories(${RAISIM_PATH}/lib)
 
+include_directories(tools/include)
+
 find_package(Eigen3 REQUIRED HINTS ${Eigen3_HINT})
 
 include_directories(
