@@ -8,6 +8,15 @@
 
 class setTime {
 
+public:
+    void setTimeInitiallize();
+    void setLocaltime();
+
+public:
+    double localtime;
+    int timeIteraition;
+    double timedT;
+
 };
 
 
