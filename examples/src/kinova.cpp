@@ -5,8 +5,10 @@
 #include <unistd.h>
 #include "raisim/RaisimServer.hpp"
 #include "raisim/World.hpp"
-#include "cubicTrajectoryGenerator.hpp"
+
 #include "setTime.hpp"
+#include "cubicTrajectoryGenerator.hpp"
+#include "jointController.hpp"
 
 int main(int argc, char* argv[]) {
     auto binaryPath = raisim::Path::setFromArgv(argv[0]);
@@ -27,20 +29,20 @@ int main(int argc, char* argv[]) {
     server.focusOn(kinova);
     kinova->setName("kinova");
 
-    /// set time
+//    jointController controller;
     setTime setTime;
-    setTime.setTimeInitiallize();
-    setTime.timedT = 0.02;
 
     /// kinova joint PD controller
-    Eigen::VectorXd jointPositionTarget(kinova->getGeneralizedCoordinateDim()), jointVelocityTarget(kinova->getDOF());
+
     Eigen::VectorXd jointPgain(kinova->getDOF()), jointDgain(kinova->getDOF());
+    Eigen::VectorXd jointPositionTarget(kinova->getGeneralizedCoordinateDim()), jointVelocityTarget(kinova->getDOF());
+
     jointPgain << 40.0, 40.0, 40.0, 15.0, 15.0, 15.0;
     jointDgain << 2.0, 2.0, 2.0, 0.5, 0.5, 0.5;
 
     ///set joint initial state
     cubicTrajectoryGenerator trajectoryGenerator[kinova->getDOF()];
-    double timeDuration = 3.0;
+    float timeDuration = 3.0;
     Eigen::VectorXd jointGoalPosition(kinova->getGeneralizedCoordinateDim());
     Eigen::VectorXd initialJointPosition(kinova->getGeneralizedCoordinateDim());
     initialJointPosition.setZero();
@@ -48,13 +50,21 @@ int main(int argc, char* argv[]) {
     kinova->setPdGains(jointPgain, jointDgain);
     kinova->setPdTarget(jointPositionTarget, jointVelocityTarget);
     kinova->setGeneralizedCoordinate(initialJointPosition);
-    sleep(5);
+    sleep(2);
 
+    float d2r = 3.141592/180;
     /// set joint goal position
+    for (int i = 0; i < kinova->getDOF(); i++)
+    {
+        std::cout << "input joint " << i+1 << " value (degree) : ";
+        std::cin >> jointGoalPosition[i];
+    }
+    jointGoalPosition = jointGoalPosition*d2r;
+    std::cout << jointGoalPosition << std::endl;
 
-    jointGoalPosition << 0.0, 3.141592, -1.57, 0.0, 2.0, 0.0;
-
-    std::cout <<  kinova->getGeneralizedCoordinate() << std::endl;
+    /// set time
+    setTime.setTimeInitiallize();
+    setTime.timedT = 0.02;
 
     /// create trajectory
     for (int i = 0; i < kinova->getDOF(); i++)
@@ -70,19 +80,24 @@ int main(int argc, char* argv[]) {
             jointPositionTarget[jointNum] = trajectoryGenerator[jointNum].getPositionTrajectory(setTime.localtime);
             jointVelocityTarget[jointNum] = trajectoryGenerator[jointNum].getVelocityTrajectory(setTime.localtime);
         }
+        std::cout << "\n" <<kinova->getGeneralizedCoordinate() << std::endl;
+
 
         /// kinova set position
         kinova->setGeneralizedCoordinate(jointPositionTarget);
+        kinova->setGeneralizedForce(Eigen::VectorXd::Zero(kinova->getDOF()));
+        kinova->setPdGains(jointPgain, jointDgain);
+        kinova->setPdTarget(jointPositionTarget, jointVelocityTarget);
         usleep(10000);
-        std::cout << kinova->getGeneralizedCoordinate() << std::endl;
+
         if (setTime.localtime == timeDuration)
             break;
     }
 
-    kinova->setPdGains(jointPgain, jointDgain);
-    kinova->setPdTarget(jointPositionTarget, jointVelocityTarget);
 
-    std::cout << kinova->getGeneralizedCoordinate() << std::endl;
+//    controller.setInitialState(kinova, initialJointPosition);
+//    controller.setPDgain(jointPgain,jointDgain);
+//    controller.setPosition(kinova,timeDuration);
 
 
     for (int i=0; i<2000000; i++) {
@@ -93,7 +108,3 @@ int main(int argc, char* argv[]) {
     server.killServer();
 }
 
-double getAccelerationTrajectory(double currentTime)
-{
-    return 0;
-}
