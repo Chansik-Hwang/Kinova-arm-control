@@ -22,3 +22,10 @@ target_link_libraries(canine
         pthread
 )
 
+add_executable(ur5 src/ur5.cpp
+        ../tools/src/cubicTrajectoryGenerator.cpp
+        ../tools/src/setTime.cpp)
+target_link_libraries(ur5
+        raisim
+        pthread
+)
