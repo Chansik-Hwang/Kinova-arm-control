@@ -2,7 +2,7 @@
 
 >This project is EE3100704
 - Inho Lee, [inholee8@pusan.ac.kr](inholee8@pusan.ac.kr)
-- Jiyoon Kim, [wldbs@pusan.ac.kr](wldbs2385@pusan.ac.kr)
+- Jiyoon Kim, [wldbs2385@pusan.ac.kr](wldbs2385@pusan.ac.kr)
 ---
 ## Dependencies
 - RAISIM
@@ -11,7 +11,7 @@
 - Cmake
 
 
---
+
 ## How to get
 ### Git package
 you must have git package
@@ -20,7 +20,7 @@ cd <YOUR_PATH>
 git clone https://github.com/YoonsGitIt/EE3100704.git
 ```
 
---
+
 ## How to initial-setup run
 ### You can install all the dependencies by initial setup.
 ### If you don't want to, you can install them separately.
