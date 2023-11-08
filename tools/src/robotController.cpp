@@ -77,7 +77,7 @@ void robotController::setFixedBasePosition(raisim::World* world, raisim::Articul
 
     /// check goal position
     std::cout << "goalPosition  :  " ;
-    for (int i = 0; i < robot->getGeneralizedCoordinateDim()-baseQuaternion; i++)
+    for (int i = 0; i < robot->getGeneralizedCoordinateDim(); i++)
     {
         std::cout << goalPosition[i];
     }
