@@ -32,9 +32,12 @@ sudo chmod +x initial_setup.sh
 ./initial_setup.sh
 ```
 - You have to enter the directory you want to install.
-  
   ex) /home/jy or /home/jy/Library
 
 - You have to enter the raisim directory you want to install.
-  
   ex) /home/jy/raisimLib/install or /home/jy/Library/raisimLib/build/install
+
+- If all installations are finished, reboot must be performed.
+```text
+sudo reboot
+```

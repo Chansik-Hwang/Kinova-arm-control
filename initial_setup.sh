@@ -46,18 +46,6 @@ cd cmake-3.21.0
 cd .. && sudo rm -rf cmake-3.21.0 && sudo rm -rf cmake-3.21.0.tar.gz
 
 echo -e "$COLOR_GREEN ----------------------- $COLOR_END"
-echo -e "$COLOR_GREEN |    INSTALL 03/14    | $COLOR_END"
-echo -e "$COLOR_GREEN |        Cmake        | $COLOR_END"
-echo -e "$COLOR_GREEN ----------------------- $COLOR_END"
-cd $INSTALL_DIR
-sudo apt-get install libssl-dev -y
-wget https://github.com/Kitware/CMake/releases/download/v3.21.0/cmake-3.21.0.tar.gz
-tar -xvf cmake-3.21.0.tar.gz
-cd cmake-3.21.0
-./bootstrap && make && sudo make install
-cd .. && sudo rm -rf cmake-3.21.0 && sudo rm -rf cmake-3.21.0.tar.gz
-
-echo -e "$COLOR_GREEN ----------------------- $COLOR_END"
 echo -e "$COLOR_GREEN |    INSTALL 05/14    | $COLOR_END"
 echo -e "$COLOR_GREEN |        CLion        | $COLOR_END"
 echo -e "$COLOR_GREEN ----------------------- $COLOR_END"
