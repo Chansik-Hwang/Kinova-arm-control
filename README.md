@@ -6,4 +6,6 @@
 ---
 ## Dependencies
 - RAISIM
-- Intel realsense
+- Eigen
+- CLion
+- Cmake
