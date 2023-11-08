@@ -10,14 +10,17 @@
 - CLion
 - Cmake
 
----
+
+--
 ## How to get
-### you must have git package
+### Git package
+you must have git package
 ```text
 cd <YOUR_PATH>
 git clone https://github.com/YoonsGitIt/EE3100704.git
 ```
 
+--
 ## How to initial-setup run
 ### You can install all the dependencies by initial setup.
 ### If you don't want to, you can install them separately.
