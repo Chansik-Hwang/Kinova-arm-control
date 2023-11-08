@@ -2,13 +2,12 @@
 // Created by jy on 23. 11. 1.
 //
 
-#include <unistd.h>
 #include "raisim/RaisimServer.hpp"
 #include "raisim/World.hpp"
 
-#include "setTime.hpp"
 #include "cubicTrajectoryGenerator.hpp"
 #include "jointController.hpp"
+#include "baseController.hpp"
 
 int main(int argc, char* argv[]) {
     auto binaryPath = raisim::Path::setFromArgv(argv[0]);
@@ -18,31 +17,38 @@ int main(int argc, char* argv[]) {
     world.setTimeStep(0.001);
 
     /// create objects
-    world.addGround();
-    auto kinova = world.addArticulatedSystem("/home/tina/EE3100704/examples/rsc/kinova/urdf/kinova.urdf");
+    auto ground = world.addGround();
+    ground->setAppearance("steel");
+    auto canine = world.addArticulatedSystem("/home/tina/EE3100704/examples/rsc/canine/urdf/canineV4_2.urdf");
 
     /// launch raisim server
     raisim::RaisimServer server(&world);
-    server.setMap("simple");
+    server.focusOn(canine);
     server.launchServer();
+    canine->setName("canine");
 
-    server.focusOn(kinova);
-    kinova->setName("kinova");
+    /// set joint Initialization
+    Eigen::VectorXd initialJointPosition(canine->getGeneralizedCoordinateDim()), jointVelocityTarget(canine->getDOF());
+    initialJointPosition << 0, 0, 0.54, 1.0, 0.0, 0.0, 0.0, 0.03, 0.4, -0.8, -0.03, 0.4, -0.8, 0.03, -0.4, 0.8, -0.03, -0.4, 0.8;
+    jointVelocityTarget.setZero();
 
-    jointController controller;
-    setTime setTime;
-    Eigen::VectorXd jointPgain(kinova->getDOF()), jointDgain(kinova->getDOF());
-    Eigen::VectorXd initialJointPosition(kinova->getGeneralizedCoordinateDim());
-    initialJointPosition.setZero();
+    Eigen::VectorXd jointPgain(canine->getDOF()), jointDgain(canine->getDOF());
+    jointPgain.tail(12).setConstant(100.0);
+    jointDgain.tail(12).setConstant(1.0);
+
+    canine->setGeneralizedCoordinate(initialJointPosition);
+    canine->setGeneralizedForce(Eigen::VectorXd::Zero(canine->getDOF()));
+    canine->setPdGains(jointPgain, jointDgain);
+    canine->setPdTarget(initialJointPosition, jointVelocityTarget);
+
     float timeDuration = 3.0;
 
-    jointPgain << 40.0, 40.0, 40.0, 15.0, 15.0, 15.0;
-    jointDgain << 2.0, 2.0, 2.0, 0.5, 0.5, 0.5;
+    /// set controller
+    jointController controller;
 
-    controller.setInitialState(kinova, initialJointPosition);
     controller.setPDgain(jointPgain,jointDgain);
-    controller.setPosition(kinova,timeDuration);
-
+    controller.setPosition(&world, canine,timeDuration);
+/*
     /// make trajectory and run
     char run;
     while (1)
@@ -51,7 +57,7 @@ int main(int argc, char* argv[]) {
         std::cin >> run;
         if (run == 'y')
         {
-            controller.setPosition(kinova,timeDuration);
+            controller.setPosition(&world, canine,timeDuration);
         }
         else
         {
@@ -59,7 +65,7 @@ int main(int argc, char* argv[]) {
             break;
         }
     }
-
+*/
     for (int i=0; i<2000000; i++)
     {
         RS_TIMED_LOOP(int(world.getTimeStep()*1e6))

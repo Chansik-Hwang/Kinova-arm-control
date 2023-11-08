@@ -54,7 +54,7 @@ void jointController::setPosition(raisim::World* world, raisim::ArticulatedSyste
     while (1)
     {
         setTime.setLocaltime(); //get in while loop.
-        for (int jointNum = 0; jointNum < robot->getDOF() ; jointNum++)
+        for (int jointNum = 0; jointNum < robot->getGeneralizedCoordinateDim() ; jointNum++)
         {
             jointPositionTarget[jointNum] = trajectoryGenerator[jointNum].getPositionTrajectory(setTime.localtime);
             jointVelocityTarget[jointNum] = trajectoryGenerator[jointNum].getVelocityTrajectory(setTime.localtime);

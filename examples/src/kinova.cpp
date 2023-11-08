@@ -2,11 +2,9 @@
 // Created by jy on 23. 11. 1.
 //
 
-#include <unistd.h>
 #include "raisim/RaisimServer.hpp"
 #include "raisim/World.hpp"
 
-#include "setTime.hpp"
 #include "cubicTrajectoryGenerator.hpp"
 #include "jointController.hpp"
 
@@ -29,8 +27,9 @@ int main(int argc, char* argv[]) {
     server.focusOn(kinova);
     kinova->setName("kinova");
 
+    /// set controller
     jointController controller;
-    setTime setTime;
+
     Eigen::VectorXd jointPgain(kinova->getDOF()), jointDgain(kinova->getDOF());
     Eigen::VectorXd initialJointPosition(kinova->getGeneralizedCoordinateDim());
     initialJointPosition.setZero();
