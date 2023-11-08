@@ -16,7 +16,7 @@ void jointController::setPDgain(Eigen::VectorXd Pgain, Eigen::VectorXd Dgain)
     mDgain = Dgain;
 }
 
-void jointController::setPosition(raisim::ArticulatedSystem *robot, float timeDuration)
+void jointController::setPosition(raisim::World* world, raisim::ArticulatedSystem *robot, float timeDuration)
 {
     cubicTrajectoryGenerator trajectoryGenerator[robot->getDOF()];
     setTime setTime;
@@ -64,12 +64,13 @@ void jointController::setPosition(raisim::ArticulatedSystem *robot, float timeDu
         /// robot set position
         robot->setGeneralizedCoordinate(jointPositionTarget);
         robot->setGeneralizedForce(Eigen::VectorXd::Zero(robot->getDOF()));
-        robot->setPdGains(mPgain, mDgain);
-        robot->setPdTarget(jointPositionTarget, jointVelocityTarget);
+        world->integrate();
         usleep(10000);
         if (setTime.localtime == timeDuration)
             break;
     }
+    robot->setPdGains(mPgain, mDgain);
+    robot->setPdTarget(jointPositionTarget, jointVelocityTarget);
     std::cout << "\n" <<robot->getGeneralizedCoordinate() << std::endl;
 
 

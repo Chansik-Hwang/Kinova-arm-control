@@ -15,7 +15,7 @@ class jointController {
 public:
     void setInitialState(raisim::ArticulatedSystem* robot, Eigen::VectorXd initialPosition);
     void setPDgain(Eigen::VectorXd Pgain, Eigen::VectorXd Dgain);
-    void setPosition(raisim::ArticulatedSystem* robot, float timeDuration);
+    void setPosition(raisim::World* world, raisim::ArticulatedSystem* robot, float timeDuration);
 
 private:
     float d2r = 3.141592/180;

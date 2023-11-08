@@ -41,7 +41,7 @@ int main(int argc, char* argv[]) {
 
     controller.setInitialState(kinova, initialJointPosition);
     controller.setPDgain(jointPgain,jointDgain);
-    controller.setPosition(kinova,timeDuration);
+    controller.setPosition(&world, kinova,timeDuration);
 
     /// make trajectory and run
     char run;
@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
         std::cin >> run;
         if (run == 'y')
         {
-            controller.setPosition(kinova,timeDuration);
+            controller.setPosition(&world, kinova,timeDuration);
         }
         else
         {
