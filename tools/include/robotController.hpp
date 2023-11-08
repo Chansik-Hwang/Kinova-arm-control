@@ -11,14 +11,22 @@
 #include "setTime.hpp"
 #include "cubicTrajectoryGenerator.hpp"
 
-class jointController {
+class robotController {
 public:
     void setInitialState(raisim::ArticulatedSystem* robot, Eigen::VectorXd initialPosition);
     void setPDgain(Eigen::VectorXd Pgain, Eigen::VectorXd Dgain);
-    void setPosition(raisim::World* world, raisim::ArticulatedSystem* robot, float timeDuration);
+    void setFixedBasePosition(raisim::World* world, raisim::ArticulatedSystem* robot, float timeDuration);
+    void setFloatingBasePosition(raisim::World* world, raisim::ArticulatedSystem* robot, float timeDuration);
+
+private:
+    void setBasePose();
 
 private:
     float d2r = 3.141592/180;
+    int baseQuaternion = 7;
+
+    Eigen::VectorXd basePose;
+
     Eigen::VectorXd mPgain;
     Eigen::VectorXd mDgain;
 };

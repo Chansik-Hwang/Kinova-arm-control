@@ -6,7 +6,7 @@
 #include "raisim/World.hpp"
 
 #include "cubicTrajectoryGenerator.hpp"
-#include "jointController.hpp"
+#include "robotController.hpp"
 #include "baseController.hpp"
 
 int main(int argc, char* argv[]) {
@@ -35,6 +35,7 @@ int main(int argc, char* argv[]) {
     Eigen::VectorXd jointPgain(canine->getDOF()), jointDgain(canine->getDOF());
     jointPgain.tail(12).setConstant(100.0);
     jointDgain.tail(12).setConstant(1.0);
+    sleep(2);
 
     canine->setGeneralizedCoordinate(initialJointPosition);
     canine->setGeneralizedForce(Eigen::VectorXd::Zero(canine->getDOF()));
@@ -44,10 +45,10 @@ int main(int argc, char* argv[]) {
     float timeDuration = 3.0;
 
     /// set controller
-    jointController controller;
+    robotController controller;
 
     controller.setPDgain(jointPgain,jointDgain);
-    controller.setPosition(&world, canine,timeDuration);
+    controller.setFloatingBasePosition(&world, canine, timeDuration);
 /*
     /// make trajectory and run
     char run;

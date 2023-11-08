@@ -6,7 +6,7 @@
 #include "raisim/World.hpp"
 
 #include "cubicTrajectoryGenerator.hpp"
-#include "jointController.hpp"
+#include "robotController.hpp"
 
 int main(int argc, char* argv[]) {
     auto binaryPath = raisim::Path::setFromArgv(argv[0]);
@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
     kinova->setName("kinova");
 
     /// set controller
-    jointController controller;
+    robotController controller;
 
     Eigen::VectorXd jointPgain(kinova->getDOF()), jointDgain(kinova->getDOF());
     Eigen::VectorXd initialJointPosition(kinova->getGeneralizedCoordinateDim());
@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
 
     controller.setInitialState(kinova, initialJointPosition);
     controller.setPDgain(jointPgain,jointDgain);
-    controller.setPosition(&world, kinova,timeDuration);
+    controller.setFixedBasePosition(&world, kinova,timeDuration);
 
     /// make trajectory and run
     char run;
@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
         std::cin >> run;
         if (run == 'y')
         {
-            controller.setPosition(&world, kinova,timeDuration);
+            controller.setFixedBasePosition(&world, kinova,timeDuration);
         }
         else
         {
