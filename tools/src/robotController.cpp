@@ -41,9 +41,9 @@ void robotController::setBasePose()
         std::cout << basePose[position] << "  ";
     }
     std::cout << "\nbase orientation : ";
-    for (int orientation = 0; orientation < 3; orientation++)
+    for (int orientation = 0; orientation < 4; orientation++)
     {
-        std::cout << basePose[orientation + 3] << "  ";
+        std::cout << basePose[orientation + 3] << "  " ;
     }
 }
 
@@ -148,7 +148,7 @@ void robotController::setFloatingBasePosition(raisim::World* world, raisim::Arti
     }
 
     /// check goal position
-    std::cout << "goalPosition  :  " ;
+    std::cout << "\ngoalPosition  :  " ;
     for (int i = 0; i < robot->getGeneralizedCoordinateDim()-baseQuaternion; i++)
     {
         std::cout << goalPosition[i];
