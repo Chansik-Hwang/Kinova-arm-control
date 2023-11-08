@@ -22,8 +22,8 @@ git clone https://github.com/YoonsGitIt/EE3100704.git
 
 
 ## How to initial-setup run
-### You can install all the dependencies by initial setup.
-### If you don't want to, you can install them separately.
+You can install all the dependencies by initial setup.
+If you don't want to, you can install them separately.
 
 ```text
 cd <YOUR_PATH>
