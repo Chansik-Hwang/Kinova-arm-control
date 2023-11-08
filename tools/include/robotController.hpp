@@ -17,6 +17,8 @@ public:
     void setPDgain(Eigen::VectorXd Pgain, Eigen::VectorXd Dgain);
     void setFixedBasePosition(raisim::World* world, raisim::ArticulatedSystem* robot, float timeDuration);
     void setFloatingBasePosition(raisim::World* world, raisim::ArticulatedSystem* robot, float timeDuration);
+    void setStand(raisim::World* world, raisim::ArticulatedSystem* robot);
+    void setSit(raisim::World* world, raisim::ArticulatedSystem* robot);
 
 private:
     void setBasePose();
