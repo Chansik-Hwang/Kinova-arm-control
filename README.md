@@ -14,7 +14,7 @@
 
 ## How to get
 ### Git package
-you must have git package
+You must have git package.
 ```text
 cd <YOUR_PATH>
 git clone https://github.com/YoonsGitIt/EE3100704.git
@@ -32,7 +32,9 @@ sudo chmod +x initial_setup.sh
 ./initial_setup.sh
 ```
 - You have to enter the directory you want to install.
+  
   ex) /home/jy or /home/jy/Library
 
 - You have to enter the raisim directory you want to install.
+  
   ex) /home/jy/raisimLib/install or /home/jy/Library/raisimLib/build/install
