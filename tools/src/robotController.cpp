@@ -74,7 +74,13 @@ void robotController::setFixedBasePosition(raisim::World* world, raisim::Articul
         std::cin >> goalPosition[i];
     }
     goalPosition = goalPosition*d2r;
-    std::cout << goalPosition << std::endl;
+
+    /// check goal position
+    std::cout << "goalPosition  :  " ;
+    for (int i = 0; i < robot->getGeneralizedCoordinateDim()-baseQuaternion; i++)
+    {
+        std::cout << goalPosition[i];
+    }
 
     /// create trajectory
     for (int i = 0; i < robot->getGeneralizedCoordinateDim(); i++)
@@ -90,7 +96,6 @@ void robotController::setFixedBasePosition(raisim::World* world, raisim::Articul
             jointPositionTarget[jointNum] = trajectoryGenerator[jointNum].getPositionTrajectory(setTime.localtime);
             jointVelocityTarget[jointNum] = trajectoryGenerator[jointNum].getVelocityTrajectory(setTime.localtime);
         }
-        std::cout << "\n" <<robot->getGeneralizedCoordinate() << std::endl;
 
         /// robot set position
         robot->setGeneralizedCoordinate(jointPositionTarget);
@@ -102,7 +107,7 @@ void robotController::setFixedBasePosition(raisim::World* world, raisim::Articul
     }
     robot->setPdGains(mPgain, mDgain);
     robot->setPdTarget(jointPositionTarget, jointVelocityTarget);
-    std::cout << "\n" <<robot->getGeneralizedCoordinate() << std::endl;
+    std::cout << "\n" <<  "robot current position  :  " << robot->getGeneralizedCoordinate() << std::endl;
 
 }
 
@@ -141,8 +146,13 @@ void robotController::setFloatingBasePosition(raisim::World* world, raisim::Arti
     {
         goalPosition[i] = basePose[i];
     }
-    std::cout << goalPosition << std::endl;
 
+    /// check goal position
+    std::cout << "goalPosition  :  " ;
+    for (int i = 0; i < robot->getGeneralizedCoordinateDim()-baseQuaternion; i++)
+    {
+        std::cout << goalPosition[i];
+    }
     /// create trajectory
     for (int i = 0; i < robot->getGeneralizedCoordinateDim(); i++)
     {
@@ -166,7 +176,7 @@ void robotController::setFloatingBasePosition(raisim::World* world, raisim::Arti
         if (setTime.localtime == timeDuration)
             break;
     }
-    std::cout << "\n" <<robot->getGeneralizedCoordinate() << std::endl;
+    std::cout << "\n" <<  "robot current position  :  " << robot->getGeneralizedCoordinate() << std::endl;
     robot->setPdTarget(jointPositionTarget, jointVelocityTarget);
 
 }
