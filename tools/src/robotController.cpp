@@ -108,15 +108,16 @@ void robotController::setFixedBasePosition(raisim::World* world, raisim::Articul
 
 void robotController::setFloatingBasePosition(raisim::World* world, raisim::ArticulatedSystem *robot, float timeDuration)
 {
-    cubicTrajectoryGenerator trajectoryGenerator[robot->getDOF()];
+    cubicTrajectoryGenerator trajectoryGenerator[robot->getGeneralizedCoordinateDim()];
     setTime setTime;
 
     Eigen::VectorXd goalPosition(robot->getGeneralizedCoordinateDim());
     Eigen::VectorXd jointPositionTarget(robot->getGeneralizedCoordinateDim()), jointVelocityTarget(robot->getDOF());
     Eigen::VectorXd currentPosition(robot->getGeneralizedCoordinateDim());
+    jointVelocityTarget.setZero();
 
     /// get joint current state
-    for (int i = 0; i < robot->getDOF(); i++)
+    for (int i = 0; i < robot->getGeneralizedCoordinateDim(); i++)
     {
         currentPosition(i) = robot->getGeneralizedCoordinate()[i] ;
     }
@@ -132,7 +133,7 @@ void robotController::setFloatingBasePosition(raisim::World* world, raisim::Arti
         std::cout << "input joint " << i+1 << " value (degree) : ";
         std::cin >> goalPosition[i+baseQuaternion];
     }
-    goalPosition = goalPosition;
+    goalPosition = d2r*goalPosition;
 
     /// set base goal position
     setBasePose();
@@ -142,10 +143,11 @@ void robotController::setFloatingBasePosition(raisim::World* world, raisim::Arti
     }
     std::cout << goalPosition << std::endl;
 
+//    goalPosition << 0, 0, 0.35, 1, 0, 0, 0, -0.00523599, 0.794125 ,-1.59523,-0.00523599, 0.802851, -1.59872, 0.00698132, 0.724311, -1.4, 0.0174533, 0.731293, -1.4;
     /// create trajectory
     for (int i = 0; i < robot->getGeneralizedCoordinateDim(); i++)
     {
-        trajectoryGenerator[i].updateTrajectory(currentPosition[i],goalPosition[i],setTime.localtime,timeDuration)  ;
+        trajectoryGenerator[i].updateTrajectory(currentPosition[i],goalPosition[i],setTime.localtime,timeDuration) ;
     }
 
     while (1)
@@ -154,20 +156,20 @@ void robotController::setFloatingBasePosition(raisim::World* world, raisim::Arti
         for (int jointNum = 0; jointNum < robot->getGeneralizedCoordinateDim() ; jointNum++)
         {
             jointPositionTarget[jointNum] = trajectoryGenerator[jointNum].getPositionTrajectory(setTime.localtime);
-            jointVelocityTarget[jointNum] = trajectoryGenerator[jointNum].getVelocityTrajectory(setTime.localtime);
         }
-        std::cout << "\n" <<robot->getGeneralizedCoordinate() << std::endl;
+        std::cout << "\n" << robot->getGeneralizedCoordinate() << std::endl;
 
         /// robot set position
         robot->setGeneralizedCoordinate(jointPositionTarget);
         robot->setGeneralizedForce(Eigen::VectorXd::Zero(robot->getDOF()));
+        robot->setPdGains(mPgain, mDgain);
+        robot->setPdTarget(jointPositionTarget, jointVelocityTarget);
         world->integrate();
         usleep(10000);
         if (setTime.localtime == timeDuration)
             break;
     }
-    robot->setPdGains(mPgain, mDgain);
-    robot->setPdTarget(jointPositionTarget, jointVelocityTarget);
     std::cout << "\n" <<robot->getGeneralizedCoordinate() << std::endl;
+    robot->setPdTarget(jointPositionTarget, jointVelocityTarget);
 
 }
