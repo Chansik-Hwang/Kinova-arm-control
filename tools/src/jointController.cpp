@@ -23,15 +23,20 @@ void jointController::setPosition(raisim::ArticulatedSystem *robot, float timeDu
 
     Eigen::VectorXd goalPosition(robot->getGeneralizedCoordinateDim());
     Eigen::VectorXd jointPositionTarget(robot->getGeneralizedCoordinateDim()), jointVelocityTarget(robot->getDOF());
-
     Eigen::VectorXd currentPosition(robot->getGeneralizedCoordinateDim());
-    robot->setGeneralizedCoordinate(currentPosition);
+
+    /// get joint current state
+    for (int i = 0; i < robot->getDOF(); i++)
+    {
+        currentPosition(i) = robot->getGeneralizedCoordinate()[i] ;
+    }
 
     /// set time
     setTime.setTimeInitiallize();
     setTime.timedT = 0.02;
 
     /// set joint goal position
+    std::cout << " " << std::endl;
     for (int i = 0; i < robot->getDOF(); i++)
     {
         std::cout << "input joint " << i+1 << " value (degree) : ";
@@ -54,6 +59,7 @@ void jointController::setPosition(raisim::ArticulatedSystem *robot, float timeDu
             jointPositionTarget[jointNum] = trajectoryGenerator[jointNum].getPositionTrajectory(setTime.localtime);
             jointVelocityTarget[jointNum] = trajectoryGenerator[jointNum].getVelocityTrajectory(setTime.localtime);
         }
+        std::cout << "\n" <<robot->getGeneralizedCoordinate() << std::endl;
 
         /// robot set position
         robot->setGeneralizedCoordinate(jointPositionTarget);
@@ -64,5 +70,7 @@ void jointController::setPosition(raisim::ArticulatedSystem *robot, float timeDu
         if (setTime.localtime == timeDuration)
             break;
     }
+    std::cout << "\n" <<robot->getGeneralizedCoordinate() << std::endl;
+
 
 }

@@ -29,82 +29,44 @@ int main(int argc, char* argv[]) {
     server.focusOn(kinova);
     kinova->setName("kinova");
 
-//    jointController controller;
+    jointController controller;
     setTime setTime;
-
-    /// kinova joint PD controller
-
     Eigen::VectorXd jointPgain(kinova->getDOF()), jointDgain(kinova->getDOF());
-    Eigen::VectorXd jointPositionTarget(kinova->getGeneralizedCoordinateDim()), jointVelocityTarget(kinova->getDOF());
+    Eigen::VectorXd initialJointPosition(kinova->getGeneralizedCoordinateDim());
+    initialJointPosition.setZero();
+    float timeDuration = 3.0;
 
     jointPgain << 40.0, 40.0, 40.0, 15.0, 15.0, 15.0;
     jointDgain << 2.0, 2.0, 2.0, 0.5, 0.5, 0.5;
 
-    ///set joint initial state
-    cubicTrajectoryGenerator trajectoryGenerator[kinova->getDOF()];
-    float timeDuration = 3.0;
-    Eigen::VectorXd jointGoalPosition(kinova->getGeneralizedCoordinateDim());
-    Eigen::VectorXd initialJointPosition(kinova->getGeneralizedCoordinateDim());
-    initialJointPosition.setZero();
+    controller.setInitialState(kinova, initialJointPosition);
+    controller.setPDgain(jointPgain,jointDgain);
+    controller.setPosition(kinova,timeDuration);
 
-    kinova->setPdGains(jointPgain, jointDgain);
-    kinova->setPdTarget(jointPositionTarget, jointVelocityTarget);
-    kinova->setGeneralizedCoordinate(initialJointPosition);
-    sleep(2);
-
-    float d2r = 3.141592/180;
-    /// set joint goal position
-    for (int i = 0; i < kinova->getDOF(); i++)
-    {
-        std::cout << "input joint " << i+1 << " value (degree) : ";
-        std::cin >> jointGoalPosition[i];
-    }
-    jointGoalPosition = jointGoalPosition*d2r;
-    std::cout << jointGoalPosition << std::endl;
-
-    /// set time
-    setTime.setTimeInitiallize();
-    setTime.timedT = 0.02;
-
-    /// create trajectory
-    for (int i = 0; i < kinova->getDOF(); i++)
-    {
-        trajectoryGenerator[i].updateTrajectory(initialJointPosition[i],jointGoalPosition[i],setTime.localtime,timeDuration)  ;
-    }
-
+    /// make trajectory and run
+    char run;
     while (1)
     {
-        setTime.setLocaltime(); //get in while loop.
-        for (int jointNum = 0; jointNum < kinova->getDOF() ; jointNum++)
+        std::cout << "\nDo you want to keep going? [y/n]  ";
+        std::cin >> run;
+        if (run == 'y')
         {
-            jointPositionTarget[jointNum] = trajectoryGenerator[jointNum].getPositionTrajectory(setTime.localtime);
-            jointVelocityTarget[jointNum] = trajectoryGenerator[jointNum].getVelocityTrajectory(setTime.localtime);
+            controller.setPosition(kinova,timeDuration);
         }
-        std::cout << "\n" <<kinova->getGeneralizedCoordinate() << std::endl;
-
-
-        /// kinova set position
-        kinova->setGeneralizedCoordinate(jointPositionTarget);
-        kinova->setGeneralizedForce(Eigen::VectorXd::Zero(kinova->getDOF()));
-        kinova->setPdGains(jointPgain, jointDgain);
-        kinova->setPdTarget(jointPositionTarget, jointVelocityTarget);
-        usleep(10000);
-
-        if (setTime.localtime == timeDuration)
+        else
+        {
+            std::cout << "Bye. Please quit. " << std::endl;
             break;
+        }
     }
 
-
-//    controller.setInitialState(kinova, initialJointPosition);
-//    controller.setPDgain(jointPgain,jointDgain);
-//    controller.setPosition(kinova,timeDuration);
-
-
-    for (int i=0; i<2000000; i++) {
+    for (int i=0; i<2000000; i++)
+    {
         RS_TIMED_LOOP(int(world.getTimeStep()*1e6))
         server.integrateWorldThreadSafe();
     }
 
     server.killServer();
+
 }
 
