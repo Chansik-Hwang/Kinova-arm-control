@@ -7,7 +7,7 @@
 
 #include "cubicTrajectoryGenerator.hpp"
 #include "robotController.hpp"
-#include "baseController.hpp"
+#include "setObstacle.hpp"
 
 int main(int argc, char* argv[]) {
     auto binaryPath = raisim::Path::setFromArgv(argv[0]);
@@ -26,6 +26,12 @@ int main(int argc, char* argv[]) {
     server.focusOn(canine);
     server.launchServer();
     canine->setName("canine");
+
+    /// set obstacle
+    setObstacle setObstacle;
+
+    float radius, mass, x, y, z;
+    setObstacle.setSphere(&world, 0.1, 1.0, 1.2, 0, 0.5);
 
     /// set joint Initialization
     Eigen::VectorXd initialJointPosition(canine->getGeneralizedCoordinateDim()), jointVelocityTarget(canine->getDOF());

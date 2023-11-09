@@ -7,6 +7,7 @@
 
 #include "cubicTrajectoryGenerator.hpp"
 #include "robotController.hpp"
+#include "setObstacle.hpp"
 
 int main(int argc, char* argv[]) {
     auto binaryPath = raisim::Path::setFromArgv(argv[0]);
@@ -26,6 +27,13 @@ int main(int argc, char* argv[]) {
 
     server.focusOn(kinova);
     kinova->setName("kinova");
+    sleep(2);
+
+    /// set obstacle
+    setObstacle setObstacle;
+
+    float radius, mass, x, y, z;
+    setObstacle.setSphere(&world, 0.5, 1.0, 0.5, 0, 0.5);
 
     /// set controller
     robotController controller;

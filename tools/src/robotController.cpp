@@ -7,7 +7,6 @@
 void robotController::setInitialState(raisim::ArticulatedSystem *robot, Eigen::VectorXd initialPosition)
 {
     robot->setGeneralizedCoordinate(initialPosition);
-    sleep(2);
 }
 
 void robotController::setPDgain(Eigen::VectorXd Pgain, Eigen::VectorXd Dgain)

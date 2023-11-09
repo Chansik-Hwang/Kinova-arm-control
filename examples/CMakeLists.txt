@@ -7,8 +7,10 @@ project(EE3100704-examples LANGUAGES CXX)
 
 add_executable(kinova src/kinova.cpp
         ../tools/src/cubicTrajectoryGenerator.cpp
+        ../tools/src/robotController.cpp
         ../tools/src/setTime.cpp
-        ../tools/src/robotController.cpp)
+        ../tools/src/setObstacle.cpp
+)
 target_link_libraries(kinova
         raisim
         pthread
@@ -17,18 +19,22 @@ target_link_libraries(kinova
 
 add_executable(canine src/canine.cpp
         ../tools/src/cubicTrajectoryGenerator.cpp
+        ../tools/src/robotController.cpp
         ../tools/src/setTime.cpp
-        ../tools/src/robotController.cpp)
+        ../tools/src/setObstacle.cpp
+)
 target_link_libraries(canine
         raisim
         pthread
 )
 
-add_executable(ur5 src/ur5.cpp
+add_executable(robot src/robot.cpp
         ../tools/src/cubicTrajectoryGenerator.cpp
+        ../tools/src/robotController.cpp
         ../tools/src/setTime.cpp
-        ../tools/src/robotController.cpp)
-target_link_libraries(ur5
+        ../tools/src/setObstacle.cpp
+)
+target_link_libraries(robot
         raisim
         pthread
 )
