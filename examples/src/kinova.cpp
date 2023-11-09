@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
         std::cin >> run;
         if (run == 'y')
         {
-            controller.setFixedBasePosition(&world, kinova,timeDuration);
+            controller.setFixedBasePosition(&world, kinova, timeDuration);
         }
         else
         {
