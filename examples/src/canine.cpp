@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
     /// create objects
     auto ground = world.addGround();
 //    ground->setAppearance("steel");
-    auto canine = world.addArticulatedSystem("/home/tina/EE3100704/examples/rsc/canine/urdf/canineV4_2.urdf");
+    auto canine = world.addArticulatedSystem("/home/jy/EE3100704/examples/rsc/canine/urdf/canineV4_2.urdf"); //set your path
 
     /// launch raisim server
     raisim::RaisimServer server(&world);
