@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
 
     /// create objects
     world.addGround();
-    auto kinova = world.addArticulatedSystem("/home/jy/EE3100704/examples/rsc/kinova/urdf/kinova.urdf"); //set your path
+    auto kinova = world.addArticulatedSystem("/home/chansik/EE3100704/examples/rsc/kinova/urdf/kinova.urdf"); //set your path
 
     /// launch raisim server
     raisim::RaisimServer server(&world);
