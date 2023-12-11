@@ -23,7 +23,7 @@ public:
 private:
     Eigen::MatrixXd mMatrixA = Eigen::MatrixXd(4, 4);
     Eigen::MatrixXd mCoefficient = Eigen::MatrixXd(4, 1);
-    Eigen::MatrixXd mFunctionValue = Eigen::MatrixXd(4, 1);
+    Eigen::MatrixXd mFunctionValue = Eigen::MatrixXd(4, 1); ///dynamic double matrix 4*1
     double mReferenceTime;
     double mTimeDuration;
 };

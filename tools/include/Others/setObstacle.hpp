@@ -12,6 +12,9 @@ class setObstacle {
 
 public:
     void setSphere(raisim::World* world, float radius, float mass, float x, float y, float z);
+    void setBox(raisim::World* world, double xLength, double yLength, double zLength, double x, double y, double z);
+//    void setTable1(raisim::World* world);
+//    void setTable2(raisim::World* world);
 };
 
 

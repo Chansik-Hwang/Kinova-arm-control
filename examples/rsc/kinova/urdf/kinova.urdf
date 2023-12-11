@@ -8,7 +8,43 @@
 
   <link name="world"/>
 
-  <!-- Base link -->
+  <link name="table_leg">
+     <visual>
+       <origin xyz="0 0 0.25" rpy="0 0 0"/>
+       <geometry>
+         <cylinder length="0.5" radius="0.07" />
+       </geometry>
+       <material name="Cyan">
+         <color rgba="0.5 0.5 0.5 0.8"/>
+       </material>
+     </visual>
+   </link>
+
+   <joint name="world_joint" type="fixed">
+     <parent link="world"/>
+     <child link="table_leg"/>
+     <origin rpy="0 0 0" xyz="0 0 0"/>
+   </joint>
+
+
+  <link name="table_plate">
+     <visual>
+       <origin xyz="0 0 0.025" rpy="0 0 0"/>
+       <geometry>
+         <cylinder length="0.05" radius="0.3" />
+       </geometry>
+       <material name="Cyan">
+         <color rgba="0.5 0.5 0.5 0.8"/>
+       </material>
+     </visual>
+   </link>
+
+   <joint name="table_joint" type="fixed">
+     <parent link="table_leg"/>
+     <child link="table_plate"/>
+     <origin rpy="0 0 0" xyz="0 0 0.5"/>
+   </joint>
+
   <link name="kinova_link_base">
     <visual>
       <geometry>
@@ -21,9 +57,9 @@
   </link>
 
   <joint name="kinova_joint_base" type="fixed">
-    <parent link="world"/>
+    <parent link="table_plate"/>
     <child link="kinova_link_base"/>
-    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <origin rpy="0 0 0" xyz="0 0 0.05"/>
   </joint>
 
   <!-- Fixed joint to add dummy inertia link -->
@@ -254,4 +290,5 @@
     <limit effort="2000" lower="0" upper="0" velocity="1"/>
     <origin rpy="3.14159265359 0 0" xyz="0 0 -0.1600"/>
   </joint>
+
 </robot>

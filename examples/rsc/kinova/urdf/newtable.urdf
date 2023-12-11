@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+<robot name="newtable">
+
+  <link name="world"/>
+
+  <joint name="world_joint" type="fixed">
+    <parent link="world"/>
+    <child link="newtable_leg"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+  </joint>
+
+  <link name="newtable_leg">
+    <visual>
+      <geometry>
+        <box size="0.1 0.1 0.4"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="-0.8 1.0 0.2"/>
+      <material name="grey">
+        <color rgba="0.9 0.9 0.9 1"/>
+      </material>
+    </visual>
+
+    <collision>
+      <geometry>
+        <box size= "0.1 0.1 0.4"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="-0.8 1.0 0.2"/>
+    </collision>
+
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx = "0.0414613" ixy = "0" ixz = "0" iyx = "0" iyy = "0.0956574" iyz = "0" izx = "0" izy = "0" izz = "0.121322"/>
+    </inertial>
+  </link>
+
+  <joint name="legjoint1" type="fixed">
+    <parent link="newtable_leg"/>
+    <child link="table_body"/>
+    <origin rpy="0 0 0" xyz="0 0.8 0.425"/>
+  </joint>
+
+  <link name="table_body">
+    <visual>
+      <geometry>
+        <box size="1.8 0.6 0.05"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="yellow">
+        <color rgba="1 1 0 1"/>
+      </material>
+    </visual>
+
+    <collision>
+      <geometry>
+        <box size= "1.8 0.6 0.05"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </collision>
+
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="1"/>
+      <inertia ixx = "0.0414613" ixy = "0" ixz = "0" iyx = "0" iyy = "0.0956574" iyz = "0" izx = "0" izy = "0" izz = "0.121322"/>
+    </inertial>
+  </link>
+
+  <joint name="legjoint2" type="fixed">
+    <parent link="table_body"/>
+    <child link="leg2"/>
+    <origin rpy="0 0 0" xyz="0.8 0.2 -0.025"/>
+  </joint>
+
+  <link name="leg2">
+    <visual>
+      <geometry>
+        <box size="0.1 0.1 0.4"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 -0.2"/>
+      <material name="grey">
+        <color rgba="0.9 0.9 0.9 1"/>
+      </material>
+    </visual>
+
+    <collision>
+      <geometry>
+        <box size= "0.1 0.1 0.4"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 -0.2"/>
+    </collision>
+  </link>
+
+  <joint name="legjoint3" type="fixed">
+    <parent link="table_body"/>
+    <child link="leg3"/>
+    <origin rpy="0 0 0" xyz="0.8 -0.2 -0.025"/>
+  </joint>
+
+  <link name="leg3">
+    <visual>
+      <geometry>
+        <box size="0.1 0.1 0.4"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 -0.2"/>
+      <material name="grey">
+        <color rgba="0.9 0.9 0.9 1"/>
+      </material>
+    </visual>
+
+    <collision>
+      <geometry>
+        <box size= "0.1 0.1 0.4"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 -0.2"/>
+    </collision>
+  </link>
+
+  <joint name="legjoint4" type="fixed">
+    <parent link="table_body"/>
+    <child link="leg4"/>
+    <origin rpy="0 0 0" xyz="-0.8 -0.2 -0.025"/>
+  </joint>
+
+  <link name="leg4">
+    <visual>
+      <geometry>
+        <box size="0.1 0.1 0.4"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 -0.2"/>
+      <material name="grey">
+        <color rgba="0.9 0.9 0.9 1"/>
+      </material>
+    </visual>
+
+    <collision>
+      <geometry>
+        <box size= "0.1 0.1 0.4"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 -0.2"/>
+    </collision>
+  </link>
+
+  <joint name="temp" type=revolute>
+    <axis xyz="0 0 1"/>
+    <parent link="leg4"/>
+    <child link="small_link"/>
+  </joint>
+
+  <link name="small_link">
+    <visual>
+      <geometry>
+        <box size="0.001 0.001 0.001"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 -0.2"/>
+      <material name="grey">
+        <color rgba="0.9 0.9 0.9 1"/>
+      </material>
+    </visual>
+  </link>
+
+</robot>

@@ -2,7 +2,7 @@
 // Created by tina on 23. 11. 7.
 //
 
-#include "robotController.hpp"
+#include "Control/robotController.hpp"
 
 void robotController::setInitialState(raisim::ArticulatedSystem *robot, Eigen::VectorXd initialPosition)
 {
@@ -85,11 +85,11 @@ void robotController::setFixedBasePosition(raisim::World* world, raisim::Articul
     for (int i = 0; i < robot->getGeneralizedCoordinateDim(); i++)
     {
         trajectoryGenerator[i].updateTrajectory(currentPosition[i],goalPosition[i],setTime.localtime,timeDuration)  ;
-    }
+    } ///calculate the Coefficient for cubic
 
     while (1)
     {
-        setTime.setLocaltime(); //get in while loop.
+        setTime.setLocaltime(); //get in while loop. time step increasing
         for (int jointNum = 0; jointNum < robot->getGeneralizedCoordinateDim() ; jointNum++)
         {
             jointPositionTarget[jointNum] = trajectoryGenerator[jointNum].getPositionTrajectory(setTime.localtime);
@@ -98,6 +98,7 @@ void robotController::setFixedBasePosition(raisim::World* world, raisim::Articul
 
         /// robot set position
         robot->setGeneralizedCoordinate(jointPositionTarget);
+
         robot->setGeneralizedForce(Eigen::VectorXd::Zero(robot->getDOF()));
         world->integrate();
         usleep(10000);
@@ -106,9 +107,12 @@ void robotController::setFixedBasePosition(raisim::World* world, raisim::Articul
     }
     robot->setPdGains(mPgain, mDgain);
     robot->setPdTarget(jointPositionTarget, jointVelocityTarget);
+
     std::cout << "\n" <<  "robot current position  :  " << robot->getGeneralizedCoordinate() << std::endl;
 
 }
+
+
 
 void robotController::setFloatingBasePosition(raisim::World* world, raisim::ArticulatedSystem *robot, float timeDuration)
 {
@@ -166,7 +170,7 @@ void robotController::setFloatingBasePosition(raisim::World* world, raisim::Arti
             jointPositionTarget[jointNum] = trajectoryGenerator[jointNum].getPositionTrajectory(setTime.localtime);
         }
         /// robot set position
-        robot->setGeneralizedCoordinate(jointPositionTarget);
+//        robot->setGeneralizedCoordinate(jointPositionTarget);
         robot->setGeneralizedForce(Eigen::VectorXd::Zero(robot->getDOF()));
         robot->setPdGains(mPgain, mDgain);
         robot->setPdTarget(jointPositionTarget, jointVelocityTarget);

@@ -8,8 +8,8 @@
 #include "raisim/World.hpp"
 #include "raisim/RaisimServer.hpp"
 
-#include "setTime.hpp"
-#include "cubicTrajectoryGenerator.hpp"
+#include "Others/setTime.hpp"
+#include "Planning/cubicTrajectoryGenerator.hpp"
 
 class robotController {
 public:

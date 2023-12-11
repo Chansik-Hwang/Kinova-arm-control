@@ -2,7 +2,7 @@
 // Created by tina on 23. 11. 6.
 //
 
-#include "../include/cubicTrajectoryGenerator.hpp"
+#include "Planning/cubicTrajectoryGenerator.hpp"
 
 void cubicTrajectoryGenerator::updateTrajectory(double currentPosition, double goalPosition, double currentTime, double timeDuration) {
     mFunctionValue << currentPosition, goalPosition, 0.0, 0.0;

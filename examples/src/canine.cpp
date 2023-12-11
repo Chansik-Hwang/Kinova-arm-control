@@ -5,9 +5,9 @@
 #include "raisim/RaisimServer.hpp"
 #include "raisim/World.hpp"
 
-#include "cubicTrajectoryGenerator.hpp"
-#include "robotController.hpp"
-#include "setObstacle.hpp"
+#include "Planning/cubicTrajectoryGenerator.hpp"
+#include "Control/robotController.hpp"
+#include "Others/setObstacle.hpp"
 
 int main(int argc, char* argv[]) {
     auto binaryPath = raisim::Path::setFromArgv(argv[0]);
