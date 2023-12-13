@@ -23,10 +23,12 @@ private:
                    Eigen::Matrix3d R34,Eigen::Matrix3d R45,Eigen::Matrix3d R56, Eigen::Matrix3d R67);
 
 public:
+    std::vector<double> FKvalue;
 
     std::vector<double> ComputeFK(std::vector<double> &inputjoints);
-    std::vector<double> FKvalue;
-//    void changeRT(Eigen::MatrixXd R);
+    std::vector<double> ComputeIK(std::vector<double> &Desiredjoints);
+
+
 
 
 };

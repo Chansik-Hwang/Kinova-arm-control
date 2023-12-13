@@ -25,14 +25,12 @@ int main(int argc, char* argv[]) {
     auto newtable = world.addArticulatedSystem("/home/chansik/EE3100704/examples/rsc/kinova/urdf/newtable.urdf");
 
     auto endeffectorIndex = kinova->getFrameIdxByLinkName("kinova_end_effector");
-    auto joint2Index = kinova->getFrameIdxByName("kinova_joint_2");
 
     raisim::Mat<3,3> rotationcheck;
     raisim::Vec<3> position;
 
     raisim::Mat<3,3> joint2rotationcheck;
     raisim::Vec<3> joint2position;
-
 
     /// launch raisim server
     raisim::RaisimServer server(&world);
@@ -53,8 +51,6 @@ int main(int argc, char* argv[]) {
     setObstacle.setBox(&world,0.3,0.3,0.4,0.7,-0.7,0.2);
     setObstacle.setBox(&world,0.3,0.3,0.4,-0.7,-0.7,0.2);
     setObstacle.setBox(&world,1.4,0.3,0.05,0,-0.7,0.425);
-
-//    setObstacle.setSphere(&world, 0.05, 1, 0.2, 0.8, 0.5);
 
     control kinovaControl;
     std::vector<double> printFK;
@@ -103,10 +99,6 @@ int main(int argc, char* argv[]) {
             kinova->getFrameOrientation(endeffectorIndex,rotationcheck);
             kinova->getFramePosition(endeffectorIndex,position);
 
-//            kinova->getFrameOrientation(joint2Index,joint2rotationcheck);
-//            kinova->getFramePosition(joint2Index,joint2position);
-
-
             printFK = kinovaControl.ComputeFK(controller.test);
 
             std::cout << "r p y x y z : ";
@@ -118,9 +110,6 @@ int main(int argc, char* argv[]) {
             std::cout << "real orientation" << std::endl;
             std::cout << rotationcheck << std::endl;
 
-//            std::cout << "joint1 Rmatrix checking" << std::endl;
-//            std::cout << joint2rotationcheck << std::endl;
-//            std::cout << "joint1 position checking : " << joint2position[0] << ", "<< joint2position[1] << ", "<< joint2position[2] << std::endl;
 //            setObstacle.setSphere(&world, 0.04, 1, joint2position[0], joint2position[1], joint2position[2]);
 
 
