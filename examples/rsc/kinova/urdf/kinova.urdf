@@ -136,7 +136,7 @@
     <limit effort="30.5" lower="-62.8318530718" upper="62.8318530718" velocity="15"/>
     <!-- limit effort also defines torque limit and freeze controller gains -->
     <origin rpy="-1.57079632679 0 3.14159265359" xyz="0 0.0016 -0.11875"/>
-    <dynamics damping="0.0" friction="0.0"/>
+    <dynamics damping="0.0" friction="0.0"/>``
   </joint>
 
   <link name="kinova_link_3">

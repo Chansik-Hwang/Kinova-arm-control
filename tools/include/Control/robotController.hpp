@@ -20,6 +20,8 @@ public:
     void setStand(raisim::World* world, raisim::ArticulatedSystem* robot);
     void setSit(raisim::World* world, raisim::ArticulatedSystem* robot);
 
+    std::vector<double> test;
+
 private:
     void setBasePose();
 

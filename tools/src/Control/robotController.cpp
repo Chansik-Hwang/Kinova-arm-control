@@ -71,11 +71,12 @@ void robotController::setFixedBasePosition(raisim::World* world, raisim::Articul
     {
         std::cout << "input joint " << i+1 << " value (degree) : ";
         std::cin >> goalPosition[i];
+        test.push_back(goalPosition[i]);
     }
     goalPosition = goalPosition*d2r;
 
     /// check goal position
-    std::cout << "goalPosition  :  " ;
+    std::cout << "goalPosition  :  ";
     for (int i = 0; i < robot->getGeneralizedCoordinateDim(); i++)
     {
         std::cout << goalPosition[i];
@@ -109,7 +110,7 @@ void robotController::setFixedBasePosition(raisim::World* world, raisim::Articul
     robot->setPdTarget(jointPositionTarget, jointVelocityTarget);
 
     std::cout << "\n" <<  "robot current position  :  " << robot->getGeneralizedCoordinate() << std::endl;
-
+    test.clear();
 }
 
 
