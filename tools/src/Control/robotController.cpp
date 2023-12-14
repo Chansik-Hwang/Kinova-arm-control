@@ -109,8 +109,10 @@ void robotController::setFixedBasePosition(raisim::World* world, raisim::Articul
     robot->setPdGains(mPgain, mDgain);
     robot->setPdTarget(jointPositionTarget, jointVelocityTarget);
 
+    for(int i=0; i<6; i++){
+        std::cout << test[i] << " ";
+    }
     std::cout << "\n" <<  "robot current position  :  " << robot->getGeneralizedCoordinate() << std::endl;
-    test.clear();
 }
 
 

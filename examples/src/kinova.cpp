@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
     setObstacle.setBox(&world,1.4,0.3,0.05,0,-0.7,0.425);
 
     control kinovaControl;
-    std::vector<double> printFK;
+    std::vector<double> FKresult;
 
     /// set controller
     robotController controller;
@@ -82,14 +82,12 @@ int main(int argc, char* argv[]) {
 
     controller.setInitialState(kinova, initialJointPosition); /// joint 6개 초기각도 0세팅
     controller.setPDgain(jointPgain,jointDgain); ///각 joint 별로 P,D게인 설정
-    controller.setFixedBasePosition(&world, kinova,timeDuration); ///
 
 
     /// make trajectory and run
     char run;
     while (1)
     {
-        int FKdatasize = kinova->getDOF();
         std::cout << "\nDo you want to keep going? [y/n]  ";
         std::cin >> run;
         if (run == 'y')
@@ -99,21 +97,22 @@ int main(int argc, char* argv[]) {
             kinova->getFrameOrientation(endeffectorIndex,rotationcheck);
             kinova->getFramePosition(endeffectorIndex,position);
 
-            printFK = kinovaControl.ComputeFK(controller.test);
+            FKresult = kinovaControl.ComputeFK(controller.test);
 
             std::cout << "r p y x y z : ";
-            for(int i=0; i<FKdatasize; i++){
-                std::cout << printFK[i] << "  ";
+            for(int i=0; i<kinova->getDOF(); i++){
+                std::cout << FKresult[i] << "  ";
             }
             std::cout << std::endl;
             std::cout << "real x y z : " << position[0] << " "<< position[1]<< " " << position[2]<< std::endl;
-            std::cout << "real orientation" << std::endl;
-            std::cout << rotationcheck << std::endl;
+//            std::cout << "real orientation" << std::endl;
+//            std::cout << rotationcheck << std::endl;
 
-//            setObstacle.setSphere(&world, 0.04, 1, joint2position[0], joint2position[1], joint2position[2]);
+            kinovaControl.ComputeIK(controller.test, kinova);
+//            setObstacle.setSphere(&world, 0.04, 1, joint2position[0], joint2position[1], joint2position[2]); for FK position check
 
-
-            printFK.clear();
+            controller.test.clear();
+            FKresult.clear();
         }
 
         else
