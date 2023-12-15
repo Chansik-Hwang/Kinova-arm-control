@@ -5,11 +5,11 @@
 
 
 
-std::vector<double> control::ComputeFK(std::vector<double> &inputjoints){ ///void 말고 joint
+Eigen::VectorXd control::ComputeFK(Eigen::VectorXd &inputjoints){ ///void 말고 joint
 
     Eigen::MatrixXd result;
+    Eigen::VectorXd FKvalue(6);
 
-    FKvalue.clear();
     for(int i=0; i<6; i++){
         inputjoints[i] = d2r*inputjoints[i];
     }
@@ -20,7 +20,7 @@ std::vector<double> control::ComputeFK(std::vector<double> &inputjoints){ ///voi
     R34=rotate(0,0,-inputjoints[3]); /// L3 to L4
     R45=rotate(0,-inputjoints[4],0); /// L4 to L5
     R56=rotate(0,0,inputjoints[5]); /// L5 to L6
-    R67=rotate(180,0,0); /// L6 to End-effector
+    R67=rotate(3.14,0,0); /// L6 to End-effector
 
 //    R01=rotate(0,180,0)*rotate(0,0,inputjoints[0]); ///base to L1
 //    R12=rotate(0,0,180)*rotate(-90,0,0)*rotate(0,0,inputjoints[1]); /// L1 to L2
@@ -30,20 +30,19 @@ std::vector<double> control::ComputeFK(std::vector<double> &inputjoints){ ///voi
 //    R56=rotate(0,0,180)*rotate(-90,0,0)*rotate(0,0,inputjoints[5]); /// L5 to L6
 //    R67=rotate(180,0,0); /// L6 to End-effector
 
-    FKvalue.push_back(0);
 
-    check_pitch(R23,R34,R56);
-    check_yaw(R12,R45,R67);
     changeR2T(R01,R12,R23,R34,R45,R56,R67);
 
     result = T01*T12*T23*T34*T45*T56*T67;
 
     for(int i=0; i<3; i++){
-        FKvalue.push_back(result(i,3));
+        FKvalue[i] = (result(i,3));
     }
 
-//    std::cout << result << std::endl;
-    std::cout << "=======================" << std::endl;
+    check_pitch(R23,R34,R56,FKvalue);
+    check_yaw(R12,R45,R67,FKvalue);
+    std::cout << result << std::endl;
+ std::cout << "=======================" << std::endl;
 
     return FKvalue;
 }
@@ -122,41 +121,46 @@ void control::changeR2T(Eigen::Matrix3d R01,Eigen::Matrix3d R12,Eigen::Matrix3d 
 
 }
 
-void control::check_pitch(Eigen::Matrix3d R12,Eigen::Matrix3d R23,Eigen::Matrix3d R45){
+void control::check_pitch(Eigen::Matrix3d R12,Eigen::Matrix3d R23,Eigen::Matrix3d R45,Eigen::VectorXd &FKvalue){
 
     Eigen::Matrix3d check_pitch = R12*R23*R45;
     double pitch_degree;
     double r2d = 180/PI;
 
     pitch_degree = r2d*asin(check_pitch(0,2)); ///V
-    FKvalue.push_back(pitch_degree);
+    FKvalue(3) = 3.141592;
+    FKvalue[4] = (pitch_degree); ///
     std::cout << std::endl;
     std::cout << "pitch rotate : " << pitch_degree << std::endl;
 
 }
 
-void control::check_yaw(Eigen::Matrix3d R01,Eigen::Matrix3d R34,Eigen::Matrix3d R56){
+void control::check_yaw(Eigen::Matrix3d R01,Eigen::Matrix3d R34,Eigen::Matrix3d R56,Eigen::VectorXd &FKvalue){
 
     Eigen::Matrix3d check_yaw = R01*R34*R56;
     double yaw_degree;
     double r2d = 180/PI;
 
     yaw_degree = r2d*asin(check_yaw(1,0));
-    FKvalue.push_back(yaw_degree);
+    FKvalue[5] = (yaw_degree); ///
     std::cout << "yaw rotate : " << yaw_degree << std::endl;
 }
 
 
-void control::ComputeIK(std::vector<double> &th, raisim::ArticulatedSystem *robot){
+void control::ComputeIK(Eigen::VectorXd &initial_angle, Eigen::VectorXd goal_pose,raisim::ArticulatedSystem *robot){
+
+    getJacobian(initial_angle);  ///update jacobian for every tik, initial angle : radian
+    double epsilon = 0.000001;
+//    compute_pseudoInverse(J);
 
 
-    getJacobian(th);
+
 
 
 
 }
 
-void control::getJacobian(std::vector<double> &th){
+void control::getJacobian(Eigen::VectorXd &th){
 
 
     Eigen::MatrixXd Jv_col1(3,1);

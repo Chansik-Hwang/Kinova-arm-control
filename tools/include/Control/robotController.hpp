@@ -13,6 +13,10 @@
 
 class robotController {
 public:
+
+    robotController() : test(6){
+
+    }
     void setInitialState(raisim::ArticulatedSystem* robot, Eigen::VectorXd initialPosition);
     void setPDgain(Eigen::VectorXd Pgain, Eigen::VectorXd Dgain);
     void setFixedBasePosition(raisim::World* world, raisim::ArticulatedSystem* robot, float timeDuration);
@@ -20,7 +24,8 @@ public:
     void setStand(raisim::World* world, raisim::ArticulatedSystem* robot);
     void setSit(raisim::World* world, raisim::ArticulatedSystem* robot);
 
-    std::vector<double> test;
+
+    Eigen::VectorXd test;
 
 private:
     void setBasePose();

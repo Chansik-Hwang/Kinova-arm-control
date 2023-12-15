@@ -29,8 +29,6 @@ int main(int argc, char* argv[]) {
     raisim::Mat<3,3> rotationcheck;
     raisim::Vec<3> position;
 
-    raisim::Mat<3,3> joint2rotationcheck;
-    raisim::Vec<3> joint2position;
 
     /// launch raisim server
     raisim::RaisimServer server(&world);
@@ -53,7 +51,9 @@ int main(int argc, char* argv[]) {
     setObstacle.setBox(&world,1.4,0.3,0.05,0,-0.7,0.425);
 
     control kinovaControl;
-    std::vector<double> FKresult;
+    Eigen::VectorXd FKresult(6);
+    Eigen::VectorXd Goalposition(6);
+    Goalposition << 1.5708, 1.5708, 1.5708, 1,1,1;
 
     /// set controller
     robotController controller;
@@ -97,22 +97,21 @@ int main(int argc, char* argv[]) {
             kinova->getFrameOrientation(endeffectorIndex,rotationcheck);
             kinova->getFramePosition(endeffectorIndex,position);
 
-            FKresult = kinovaControl.ComputeFK(controller.test);
 
-            std::cout << "r p y x y z : ";
+            FKresult << kinovaControl.ComputeFK(controller.test);
+
+            std::cout << "x y z r p y : ";
             for(int i=0; i<kinova->getDOF(); i++){
                 std::cout << FKresult[i] << "  ";
             }
             std::cout << std::endl;
             std::cout << "real x y z : " << position[0] << " "<< position[1]<< " " << position[2]<< std::endl;
-//            std::cout << "real orientation" << std::endl;
-//            std::cout << rotationcheck << std::endl;
+            std::cout << "real orientation" << std::endl;
+            std::cout << rotationcheck << std::endl;
 
-            kinovaControl.ComputeIK(controller.test, kinova);
+            kinovaControl.ComputeIK(controller.test,Goalposition,kinova);
 //            setObstacle.setSphere(&world, 0.04, 1, joint2position[0], joint2position[1], joint2position[2]); for FK position check
 
-            controller.test.clear();
-            FKresult.clear();
         }
 
         else

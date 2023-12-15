@@ -24,12 +24,12 @@ private:
     Eigen::MatrixXd J;
 
     Eigen::Matrix3d rotate(double r, double p, double y);
-    void check_pitch(Eigen::Matrix3d R12,Eigen::Matrix3d R23,Eigen::Matrix3d R45);
-    void check_yaw(Eigen::Matrix3d R01,Eigen::Matrix3d R34,Eigen::Matrix3d R56);
+    void check_pitch(Eigen::Matrix3d R12,Eigen::Matrix3d R23,Eigen::Matrix3d R45,Eigen::VectorXd &FKvalue);
+    void check_yaw(Eigen::Matrix3d R01,Eigen::Matrix3d R34,Eigen::Matrix3d R56,Eigen::VectorXd &FKvalue);
     void changeR2T(Eigen::Matrix3d R01,Eigen::Matrix3d R12,Eigen::Matrix3d R23,
                    Eigen::Matrix3d R34,Eigen::Matrix3d R45,Eigen::Matrix3d R56, Eigen::Matrix3d R67);
 
-    void getJacobian(std::vector<double> &th);
+    void getJacobian(Eigen::VectorXd &th);
 
 public:
     control() : Jacobian_v(3, 6),Jacobian_w(3, 6),J(6, 6){
@@ -37,10 +37,9 @@ public:
     }
 
 
-    std::vector<double> FKvalue;
+    Eigen::VectorXd ComputeFK(Eigen::VectorXd &inputjoints);
+    void ComputeIK(Eigen::VectorXd &initial_angle, Eigen::VectorXd goal_pose,raisim::ArticulatedSystem *robot);
 
-    std::vector<double> ComputeFK(std::vector<double> &inputjoints);
-    void ComputeIK(std::vector<double> &th, raisim::ArticulatedSystem *robot);
 
 
 
