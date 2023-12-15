@@ -39,9 +39,9 @@ Eigen::VectorXd control::ComputeFK(Eigen::VectorXd &inputjoints){ ///void 말고
         FKvalue[i] = (result(i,3));
     }
 
-    check_pitch(R23,R34,R56,FKvalue);
-    check_yaw(R12,R45,R67,FKvalue);
-    std::cout << result << std::endl;
+    check_pitch(R12,R23,R45,FKvalue);
+    check_yaw(R01,R34,R56,FKvalue);
+//    std::cout << result << std::endl;
  std::cout << "=======================" << std::endl;
 
     return FKvalue;
@@ -121,6 +121,7 @@ void control::changeR2T(Eigen::Matrix3d R01,Eigen::Matrix3d R12,Eigen::Matrix3d 
 
 }
 
+
 void control::check_pitch(Eigen::Matrix3d R12,Eigen::Matrix3d R23,Eigen::Matrix3d R45,Eigen::VectorXd &FKvalue){
 
     Eigen::Matrix3d check_pitch = R12*R23*R45;
@@ -149,14 +150,34 @@ void control::check_yaw(Eigen::Matrix3d R01,Eigen::Matrix3d R34,Eigen::Matrix3d 
 
 void control::ComputeIK(Eigen::VectorXd &initial_angle, Eigen::VectorXd goal_pose,raisim::ArticulatedSystem *robot){
 
-    getJacobian(initial_angle);  ///update jacobian for every tik, initial angle : radian
     double epsilon = 0.000001;
-//    compute_pseudoInverse(J);
+    double step_size = 0.01;
+    //    compute_pseudoInverse(J);
+    Eigen::VectorXd delta_X(6);
+    Eigen::VectorXd Task_cur(6);
+    Eigen::VectorXd Joint_cur(6);
+    getJacobian(initial_angle);
+//    while((delta_X.array().abs().maxCoeff() > epsilon)){
+//        int count = 0;
+//        if(count ==0){
+//            Task_cur=ComputeFK(initial_angle);
+//            delta_X << step_size*(goal_pose-Task_cur);
+//            getJacobian(initial_angle);  ///update jacobian for every tik, initial angle : radian
+//            Inv_J = J.inverse();
+//            Joint_cur << initial_angle+Inv_J*delta_X;
+//            count++;
+//        }
+//        else{
+//            Task_cur = ComputeFK(Joint_cur);
+//            delta_X = step_size*(goal_pose-Task_cur);
+//            getJacobian(Joint_cur);  ///update jacobian for every tik, initial angle : radian
+//            Inv_J = J.inverse();
+//            Joint_cur << Joint_cur+Inv_J*delta_X;
+//        }
+//    }
 
-
-
-
-
+//    std::cout << "IK checking!!! : computed Joints" << std::endl;
+//    std::cout << ComputeFK(Joint_cur);
 
 }
 
@@ -223,8 +244,10 @@ void control::getJacobian(Eigen::VectorXd &th){
     Jacobian_w << Jw_col1, Jw_col2,Jw_col3,Jw_col4,Jw_col5,Jw_col6;
 
     J << Jacobian_v, Jacobian_w;
-    std::cout << "------Jacobian Matrix------" << std::endl;
-    std::cout << J << std::endl;
+//    std::cout << "------Jacobian Matrix------" << std::endl;
+//    std::cout << J << std::endl;
+
+    testJ << J;
 }
 
 

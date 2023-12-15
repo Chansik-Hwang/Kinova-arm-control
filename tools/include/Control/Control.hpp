@@ -22,6 +22,7 @@ private:
     Eigen::MatrixXd Jacobian_v;
     Eigen::MatrixXd Jacobian_w;
     Eigen::MatrixXd J;
+    Eigen::MatrixXd Inv_J;
 
     Eigen::Matrix3d rotate(double r, double p, double y);
     void check_pitch(Eigen::Matrix3d R12,Eigen::Matrix3d R23,Eigen::Matrix3d R45,Eigen::VectorXd &FKvalue);
@@ -32,7 +33,7 @@ private:
     void getJacobian(Eigen::VectorXd &th);
 
 public:
-    control() : Jacobian_v(3, 6),Jacobian_w(3, 6),J(6, 6){
+    control() : Jacobian_v(3, 6),Jacobian_w(3, 6),J(6, 6), Inv_J(6,6),testJ(6,6){
 
     }
 
@@ -40,6 +41,7 @@ public:
     Eigen::VectorXd ComputeFK(Eigen::VectorXd &inputjoints);
     void ComputeIK(Eigen::VectorXd &initial_angle, Eigen::VectorXd goal_pose,raisim::ArticulatedSystem *robot);
 
+    Eigen::MatrixXd testJ;
 
 
 

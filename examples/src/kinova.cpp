@@ -25,10 +25,18 @@ int main(int argc, char* argv[]) {
     auto newtable = world.addArticulatedSystem("/home/chansik/EE3100704/examples/rsc/kinova/urdf/newtable.urdf");
 
     auto endeffectorIndex = kinova->getFrameIdxByLinkName("kinova_end_effector");
+    auto endeffectorjoint = kinova->getFrameIdxByLinkName("kinova_joint_end_effector");
+    auto EndBodyindex = kinova->getBodyIdx("kinova_joint_6");
+
 
     raisim::Mat<3,3> rotationcheck;
     raisim::Vec<3> position;
 
+    raisim::Vec<3> vel;
+    raisim::Vec<3> angvel;
+    raisim::Vec<6> computedvel;
+    raisim::VecDyn jointvelocity = raisim::VecDyn(6);
+    Eigen::VectorXd jointvel(6);
 
     /// launch raisim server
     raisim::RaisimServer server(&world);
@@ -83,7 +91,7 @@ int main(int argc, char* argv[]) {
     controller.setInitialState(kinova, initialJointPosition); /// joint 6개 초기각도 0세팅
     controller.setPDgain(jointPgain,jointDgain); ///각 joint 별로 P,D게인 설정
 
-
+    std::cout <<"BodyIdx : " << EndBodyindex <<std::endl;
     /// make trajectory and run
     char run;
     while (1)
@@ -96,6 +104,10 @@ int main(int argc, char* argv[]) {
 
             kinova->getFrameOrientation(endeffectorIndex,rotationcheck);
             kinova->getFramePosition(endeffectorIndex,position);
+//            kinova->getVelocity(EndBodyindex,posinbodyframe,vel);
+            kinova->getFrameVelocity(endeffectorIndex,vel);
+            kinova->getFrameAngularVelocity(endeffectorIndex,angvel);
+
 
 
             FKresult << kinovaControl.ComputeFK(controller.test);
@@ -109,9 +121,24 @@ int main(int argc, char* argv[]) {
             std::cout << "real orientation" << std::endl;
             std::cout << rotationcheck << std::endl;
 
-            kinovaControl.ComputeIK(controller.test,Goalposition,kinova);
-//            setObstacle.setSphere(&world, 0.04, 1, joint2position[0], joint2position[1], joint2position[2]); for FK position check
+            std::cout << "1. linear,angular velocity" << std::endl;
+            std::cout << vel;
+            std::cout << angvel << std::endl;
 
+            jointvelocity = kinova->getGeneralizedVelocity(); ///joint velocity
+            for(int i=0; i<6; i++){
+                jointvel[i] = jointvelocity[i]; ///change to Eigen vector
+            }
+            std::cout << "2. jointvelocity" << std::endl;
+            std::cout << jointvel << std::endl;
+
+            kinovaControl.ComputeIK(controller.test,Goalposition,kinova);
+
+            std::cout << "3. J*jointvelocity computed" << std::endl;
+            computedvel = kinovaControl.testJ*jointvel;
+            std::cout << computedvel << std::endl;
+
+//            setObstacle.setSphere(&world, 0.04, 1, joint2position[0], joint2position[1], joint2position[2]); for FK position check
         }
 
         else
