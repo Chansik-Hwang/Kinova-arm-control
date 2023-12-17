@@ -140,12 +140,7 @@ void control::getOrientation(Eigen::MatrixXd Tmatrix, Eigen::VectorXd &FKvalue){
         Pitch = -PI/2;
         Yaw = 0;
     }
-    /// sinB=0
-    else if( abs(check_sign) < epsilon){
-            Roll = atan2(Orientation(2,1),Orientation(2,2));
-            Pitch = 0;
-            Yaw = atan2(Orientation(1,0),Orientation(0,0));
-    }
+
     /// sinB >0,<0 ,,, B : -PI~PI
     else {
         ///pitch angle B : 0~PI/2 가정, cosB>0
@@ -201,9 +196,6 @@ void control::getOrientation(Eigen::MatrixXd Tmatrix, Eigen::VectorXd &FKvalue){
 //            Yaw = atan2(-Orientation(0,0),-Orientation(1,0));
 //        }
 //    }
-
-
-
     for(int i=0; i<3; i++){
         FKvalue[i] = (Tmatrix(i,3));
     }
