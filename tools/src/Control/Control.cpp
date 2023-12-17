@@ -35,14 +35,10 @@ Eigen::VectorXd control::ComputeFK(Eigen::VectorXd &inputjoints){ ///void 말고
 
     result = T01*T12*T23*T34*T45*T56*T67;
 
-    for(int i=0; i<3; i++){
-        FKvalue[i] = (result(i,3));
-    }
+    getOrientation(result,FKvalue);
 
-    check_pitch(R12,R23,R45,FKvalue);
-    check_yaw(R01,R34,R56,FKvalue);
 //    std::cout << result << std::endl;
- std::cout << "=======================" << std::endl;
+    std::cout << "=======================" << std::endl;
 
     return FKvalue;
 }
@@ -121,31 +117,104 @@ void control::changeR2T(Eigen::Matrix3d R01,Eigen::Matrix3d R12,Eigen::Matrix3d 
 
 }
 
+void control::getOrientation(Eigen::MatrixXd Tmatrix, Eigen::VectorXd &FKvalue){
 
-void control::check_pitch(Eigen::Matrix3d R12,Eigen::Matrix3d R23,Eigen::Matrix3d R45,Eigen::VectorXd &FKvalue){
+    Eigen::MatrixXd Orientation(3,3);
+    Eigen::MatrixXd FindAngle(2,2);
+    FindAngle.setZero();
+    Orientation.setZero();
+    Orientation << Tmatrix.block<3,3>(0,0);
 
-    Eigen::Matrix3d check_pitch = R12*R23*R45;
-    double pitch_degree;
-    double r2d = 180/PI;
+    const double epsilon = 1e-3;
+    double check_sign = -Orientation(2,0);
+    double Roll, Pitch, Yaw;
+    double E1,E2,E3,E4;
 
-    pitch_degree = r2d*asin(check_pitch(0,2)); ///V
-    FKvalue(3) = 3.141592;
-    FKvalue[4] = (pitch_degree); ///
+    if(abs(check_sign-1)< epsilon) { /// singularity
+        Roll = atan2(Orientation(0,1),Orientation(1,1));
+        Pitch = PI/2;
+        Yaw = 0;
+    }
+    else if(abs(check_sign+1)< epsilon){ /// singularity
+        Roll = -atan2(Orientation(0,1),Orientation(1,1));
+        Pitch = -PI/2;
+        Yaw = 0;
+    }
+    /// sinB=0
+    else if( abs(check_sign) < epsilon){
+            Roll = atan2(Orientation(2,1),Orientation(2,2));
+            Pitch = 0;
+            Yaw = atan2(Orientation(1,0),Orientation(0,0));
+    }
+    /// sinB >0,<0 ,,, B : -PI~PI
+    else {
+        ///pitch angle B : 0~PI/2 가정, cosB>0
+        Roll = atan2(Orientation(2,1),Orientation(2,2));
+        Pitch = atan2(-Orientation(2,0),sqrt(pow(Orientation(0,0),2)+pow(Orientation(1,0),2)));
+        Yaw = atan2(Orientation(1,0),Orientation(0,0));
+
+        FindAngle(0,0) = cos(Yaw)*sin(Pitch)*sin(Roll)-sin(Yaw)*cos(Roll);
+        FindAngle(1,0) = sin(Yaw)*sin(Pitch)*sin(Roll)+cos(Yaw)*cos(Roll);
+        FindAngle(0,1) = cos(Yaw)*sin(Pitch)*cos(Roll)+sin(Yaw)*sin(Roll);
+        FindAngle(1,1) = sin(Yaw)*sin(Pitch)*cos(Roll)-cos(Yaw)*sin(Roll);
+
+        E1 = abs(FindAngle(0,0)-Orientation(0,1));
+        E2 = abs(FindAngle(1,0)-Orientation(1,1));
+        E3 = abs(FindAngle(0,1)-Orientation(0,2));
+        E4 = abs(FindAngle(1,1)-Orientation(1,2));
+
+        if(E1<0.01 && E2<0.01 && E3<0.01 && E4<0.01){
+
+        }
+        else{
+        ///pitch angle B PI/2 ~ PI => cosB <0
+            Roll = atan2(-Orientation(2,1),-Orientation(2,2));
+            Pitch = atan2(-Orientation(2,0),-sqrt(pow(Orientation(0,0),2)+pow(Orientation(1,0),2)));
+            Yaw = atan2(-Orientation(1,0),-Orientation(0,0));
+        }
+    }
+    ///pitch angle B : -PI~0
+//    else if (check_sign < 0){
+//        ///pitch angle B : -PI/2 ~ 0 가정, cosB >0
+//        Roll = atan2(Orientation(2,2),Orientation(2,1));
+//        Pitch = atan2(sqrt(pow(Orientation(0,0),2)+pow(Orientation(1,0),2)),-Orientation(2,0));
+//        Yaw = atan2(Orientation(0,0),Orientation(1,0));
+//
+//        FindAngle(0,0) = cos(Yaw)*sin(Pitch)*sin(Roll)-sin(Yaw)*cos(Roll);
+//        FindAngle(1,0) = sin(Yaw)*sin(Pitch)*sin(Roll)+cos(Yaw)*cos(Roll);
+//        FindAngle(0,1) = cos(Yaw)*sin(Pitch)*cos(Roll)+sin(Yaw)*sin(Roll);
+//        FindAngle(1,1) = sin(Yaw)*sin(Pitch)*cos(Roll)-cos(Yaw)*sin(Roll);
+//
+//        E1 = abs(FindAngle(0,0)-Orientation(0,1));
+//        E2 = abs(FindAngle(1,0)-Orientation(1,1));
+//        E3 = abs(FindAngle(0,1)-Orientation(0,2));
+//        E4 = abs(FindAngle(1,1)-Orientation(1,2));
+//
+//
+//        if(E1<0.01 && E2<0.01 && E3<0.01 && E4<0.01){
+//
+//        }
+//        else{
+//        ///pitch angle B -PI ~ -PI/2 => cosB <0
+//            Roll = atan2(-Orientation(2,2),-Orientation(2,1));
+//            Pitch = atan2(-sqrt(pow(Orientation(0,0),2)+pow(Orientation(1,0),2)),-Orientation(2,0));
+//            Yaw = atan2(-Orientation(0,0),-Orientation(1,0));
+//        }
+//    }
+
+
+
+    for(int i=0; i<3; i++){
+        FKvalue[i] = (Tmatrix(i,3));
+    }
+    FKvalue[3] = r2d*Roll;
+    FKvalue[4] = r2d*Pitch;
+    FKvalue[5] = r2d*Yaw;
+
     std::cout << std::endl;
-    std::cout << "pitch rotate : " << pitch_degree << std::endl;
-
+    std::cout << FindAngle << std::endl;
 }
 
-void control::check_yaw(Eigen::Matrix3d R01,Eigen::Matrix3d R34,Eigen::Matrix3d R56,Eigen::VectorXd &FKvalue){
-
-    Eigen::Matrix3d check_yaw = R01*R34*R56;
-    double yaw_degree;
-    double r2d = 180/PI;
-
-    yaw_degree = r2d*asin(check_yaw(1,0));
-    FKvalue[5] = (yaw_degree); ///
-    std::cout << "yaw rotate : " << yaw_degree << std::endl;
-}
 
 
 void control::ComputeIK(Eigen::VectorXd &initial_angle, Eigen::VectorXd goal_pose,raisim::ArticulatedSystem *robot){
