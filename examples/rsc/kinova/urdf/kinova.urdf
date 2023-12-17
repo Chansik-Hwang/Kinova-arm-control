@@ -18,6 +18,13 @@
          <color rgba="0.5 0.5 0.5 0.8"/>
        </material>
      </visual>
+
+     <collision>
+       <geometry>
+         <cylinder length = "0.5" radius="0.07" />
+       </geometry>
+       <origin rpy="0 0 0" xyz="0 0 0.25"/>
+     </collision>
    </link>
 
    <joint name="world_joint" type="fixed">
@@ -37,6 +44,13 @@
          <color rgba="0.5 0.5 0.5 0.8"/>
        </material>
      </visual>
+
+     <collision>
+       <geometry>
+         <cylinder length = "0.05" radius="0.3" />
+       </geometry>
+       <origin rpy="0 0 0" xyz="0 0 0.025"/>
+     </collision>
    </link>
 
    <joint name="table_joint" type="fixed">
@@ -54,6 +68,15 @@
         <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1"/>
       </material>
     </visual>
+
+    <collision>
+      <geometry>
+        <cylinder length = "0.15" radius="0.035" />
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.075"/>
+    </collision>
+
+
   </link>
 
   <joint name="kinova_joint_base" type="fixed">
@@ -122,6 +145,14 @@
         <mesh filename="../meshes/ring_big.STL"/>
       </geometry>
     </visual>
+
+    <collision>
+      <geometry>
+        <box size = "0.06 0.45 0.015"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 -0.21 -0.02"/>
+    </collision>
+
     <inertial>
       <mass value="0.99"/>
       <origin xyz="0 -0.2065 -0.01"/>
@@ -153,6 +184,14 @@
         <mesh filename="../meshes/ring_big.STL"/>
       </geometry>
     </visual>
+
+    <collision>
+      <geometry>
+        <box size = "0.06 0.22 0.015"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0.09 -0.02"/>
+    </collision>
+
     <inertial>
       <mass value="0.6763"/>
       <origin xyz="0 0.081 -0.0086"/>
@@ -219,6 +258,13 @@
     </visual>
     --&gt;
 
+    <collision>
+      <geometry>
+        <box size = "0.05 0.15 0.02" />
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0.05 -0.015"/>
+    </collision>
+
     <inertial>
       <mass value="0.463"/>
       <origin xyz="0 0.0497208855 -0.0028562765"/>
@@ -250,6 +296,12 @@
         <mesh filename="../meshes/ring_small.STL"/>
       </geometry>
     </visual>
+    <collision>
+      <geometry>
+        <box size = "0.075 0.075 0.075"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 -0.07"/>
+    </collision>
     <inertial>
       <mass value="1.327"/>
       <!-- 0.927 is original mass without additional force sensor -->
