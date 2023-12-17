@@ -10,10 +10,6 @@ Eigen::VectorXd control::ComputeFK(Eigen::VectorXd &inputjoints){ ///void 말고
     Eigen::MatrixXd result;
     Eigen::VectorXd FKvalue(6);
 
-    for(int i=0; i<6; i++){
-        inputjoints[i] = d2r*inputjoints[i];
-    }
-
     R01=rotate(0,0,-inputjoints[0]); ///base to L1+
     R12=rotate(0,-inputjoints[1],0); /// L1 to L2
     R23=rotate(0,inputjoints[2],0); /// L2 to L3
@@ -197,59 +193,66 @@ void control::getOrientation(Eigen::MatrixXd Tmatrix, Eigen::VectorXd &FKvalue){
     for(int i=0; i<3; i++){
         FKvalue[i] = (Tmatrix(i,3));
     }
-    FKvalue[3] = r2d*Roll;
-    FKvalue[4] = r2d*Pitch;
-    FKvalue[5] = r2d*Yaw;
+    FKvalue[3] = Roll;
+    FKvalue[4] = Pitch;
+    FKvalue[5] = Yaw;
 }
 
 void control::ComputeIK(Eigen::VectorXd &initial_angle, Eigen::VectorXd goal_pose,raisim::ArticulatedSystem *robot){
 
 
-    double epsilon = 0.01;
-    double step_size = 0.1;
-    //    compute_pseudoInverse(J);
+    double epsilon = 0.000001;
+    double step_size = 0.005;
     Eigen::VectorXd delta_X(robot->getDOF());
     Eigen::VectorXd Task_cur(robot->getDOF());
     Eigen::VectorXd Joint_cur(robot->getDOF());
-    Eigen::VectorXd initial_angle_dd = initial_angle*r2d; ///degree
-    std::cout << "initial_angle : " << initial_angle << std::endl;
-    std::cout << "initial_angle_dd : " << initial_angle_dd << std::endl;
+    Eigen::VectorXd initial_angle_d = initial_angle*r2d; ///degree
+    Eigen::VectorXd IK_TestVal(6);
 
-//
-//    for(int i=3; i<6; i++){
-//        goal_pose[i] = d2r*goal_pose[i];
-//    }
-    std::cout << "delta_X : " << delta_X << std::endl;
+    for(int i=3; i<6; i++){
+        goal_pose[i] = d2r*goal_pose[i]; /// goal pose: degree -> radian, initial angle : radian
+    }
+
+    std::cout << "Task_cur : " << std::endl;
+    Task_cur=ComputeFK(initial_angle); ///degree
+    std::cout << Task_cur << std::endl;
+
+    std::cout << "goal_pose : " << std::endl;
+    std::cout << goal_pose << std::endl;
+
+    delta_X << step_size*(goal_pose-Task_cur);
+    std::cout << "delta_x " << std::endl;
+    std::cout << delta_X << std::endl;
+
     int count = 0;
     while((delta_X.array().abs().maxCoeff() > epsilon)){
         if(count == 0){
-            Task_cur=ComputeFK(initial_angle_dd); ///degree
-            delta_X << step_size*(goal_pose-Task_cur);
+            std::cout << "Hello" << std::endl;
             getJacobian(initial_angle);  ///update jacobian for every tik, initial angle : radian
             Inv_J = J.inverse();
-            std::cout << delta_X << std::endl;
-            Joint_cur << initial_angle_dd+Inv_J*delta_X; ///degree
+            Joint_cur << initial_angle+Inv_J*delta_X; ///degree
             count++;
         }
         else{
             Task_cur = ComputeFK(Joint_cur);
             delta_X = step_size*(goal_pose-Task_cur);
-            Joint_cur = Joint_cur*d2r;
+            std::cout << "Descending..." << std::endl;
             getJacobian(Joint_cur);  ///update jacobian for every tik, initial angle : radian
             Inv_J = J.inverse();
 //            std::cout << Inv_J << std::endl;
-            Joint_cur = Joint_cur*r2d;
-//            std::cout << "Joint_cur : " << Joint_cur << std::endl;
             Joint_cur << Joint_cur+Inv_J*delta_X; ///degree
         }
-//        std::cout << "computing" << std::endl;
     }
+    IK_TestVal << ComputeFK(Joint_cur);
+    IK_TestVal[3] = IK_TestVal[3]*r2d;
+    IK_TestVal[4] = IK_TestVal[4]*r2d;
+    IK_TestVal[5] = IK_TestVal[5]*r2d;
+
     std::cout << "While ended" << std::endl;
     std::cout << "IK checking!!! : computed Joints" << std::endl;
     std::cout << Joint_cur << std::endl; ///degree
     std::cout << "Check IK value using joints" << std::endl;
-    std::cout << ComputeFK(Joint_cur); ///degree
-
+    std::cout << IK_TestVal << std::endl;
 }
 
 void control::getJacobian(Eigen::VectorXd &th){

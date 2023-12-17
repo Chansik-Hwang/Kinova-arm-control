@@ -14,7 +14,7 @@
 class robotController {
 public:
 
-    robotController() : test(6){
+    robotController() : JointSpaceInput(6){
 
     }
     void setInitialState(raisim::ArticulatedSystem* robot, Eigen::VectorXd initialPosition);
@@ -25,7 +25,7 @@ public:
     void setSit(raisim::World* world, raisim::ArticulatedSystem* robot);
 
 
-    Eigen::VectorXd test;
+    Eigen::VectorXd JointSpaceInput;
 
 private:
     void setBasePose();

@@ -59,7 +59,8 @@ int main(int argc, char* argv[]) {
     control kinovaControl;
     Eigen::VectorXd FKresult(6);
     Eigen::VectorXd Goalposition(6);
-    Goalposition << -0.232893,-0.453875,1.07644,94.9278,-4.98094,-80.4369;
+    Goalposition << -0.183615, -0.488176, 1.01955, 100.06, -9.84657, -71.7538; ///degree
+
 
     /// set controller
     robotController controller;
@@ -106,9 +107,13 @@ int main(int argc, char* argv[]) {
 
 
 
-            FKresult << kinovaControl.ComputeFK(controller.test);
+            FKresult << kinovaControl.ComputeFK(controller.JointSpaceInput);
 
-            std::cout << "x y z r p y : ";
+            std::cout << "x y z r p y(degree) : ";
+            FKresult[3] = FKresult[3]*180/PI;
+            FKresult[4] = FKresult[4]*180/PI;
+            FKresult[5] = FKresult[5]*180/PI;
+
             for(int i=0; i<kinova->getDOF(); i++){
                 std::cout << FKresult[i] << "  ";
             }
@@ -128,10 +133,10 @@ int main(int argc, char* argv[]) {
 //            std::cout << "2. jointvelocity" << std::endl;
 //            std::cout << jointvel << std::endl;
 
-            kinovaControl.ComputeIK(controller.test,Goalposition,kinova);
+            kinovaControl.ComputeIK(controller.JointSpaceInput,Goalposition,kinova);
 
 //            std::cout << "3. J*jointvelocity computed" << std::endl;
-//            computedvel << kinovaControl.testJ*jointvel;
+//            computedvel << kinovaControl.JointSpaceInputJ*jointvel;
 //            std::cout << computedvel << std::endl;
 
 //            setObstacle.setSphere(&world, 0.04, 1, joint2position[0], joint2position[1], joint2position[2]); for FK position check
