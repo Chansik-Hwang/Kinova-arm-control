@@ -38,7 +38,6 @@ Eigen::VectorXd control::ComputeFK(Eigen::VectorXd &inputjoints){ ///void 말고
     getOrientation(result,FKvalue);
 
 //    std::cout << result << std::endl;
-    std::cout << "=======================" << std::endl;
 
     return FKvalue;
 }
@@ -140,7 +139,6 @@ void control::getOrientation(Eigen::MatrixXd Tmatrix, Eigen::VectorXd &FKvalue){
         Pitch = -PI/2;
         Yaw = 0;
     }
-
     /// sinB >0,<0 ,,, B : -PI~PI
     else {
         ///pitch angle B : 0~PI/2 가정, cosB>0
@@ -202,43 +200,55 @@ void control::getOrientation(Eigen::MatrixXd Tmatrix, Eigen::VectorXd &FKvalue){
     FKvalue[3] = r2d*Roll;
     FKvalue[4] = r2d*Pitch;
     FKvalue[5] = r2d*Yaw;
-
-    std::cout << std::endl;
-    std::cout << FindAngle << std::endl;
 }
-
-
 
 void control::ComputeIK(Eigen::VectorXd &initial_angle, Eigen::VectorXd goal_pose,raisim::ArticulatedSystem *robot){
 
-    double epsilon = 0.000001;
-    double step_size = 0.01;
-    //    compute_pseudoInverse(J);
-    Eigen::VectorXd delta_X(6);
-    Eigen::VectorXd Task_cur(6);
-    Eigen::VectorXd Joint_cur(6);
-    getJacobian(initial_angle);
-//    while((delta_X.array().abs().maxCoeff() > epsilon)){
-//        int count = 0;
-//        if(count ==0){
-//            Task_cur=ComputeFK(initial_angle);
-//            delta_X << step_size*(goal_pose-Task_cur);
-//            getJacobian(initial_angle);  ///update jacobian for every tik, initial angle : radian
-//            Inv_J = J.inverse();
-//            Joint_cur << initial_angle+Inv_J*delta_X;
-//            count++;
-//        }
-//        else{
-//            Task_cur = ComputeFK(Joint_cur);
-//            delta_X = step_size*(goal_pose-Task_cur);
-//            getJacobian(Joint_cur);  ///update jacobian for every tik, initial angle : radian
-//            Inv_J = J.inverse();
-//            Joint_cur << Joint_cur+Inv_J*delta_X;
-//        }
-//    }
 
-//    std::cout << "IK checking!!! : computed Joints" << std::endl;
-//    std::cout << ComputeFK(Joint_cur);
+    double epsilon = 0.01;
+    double step_size = 0.1;
+    //    compute_pseudoInverse(J);
+    Eigen::VectorXd delta_X(robot->getDOF());
+    Eigen::VectorXd Task_cur(robot->getDOF());
+    Eigen::VectorXd Joint_cur(robot->getDOF());
+    Eigen::VectorXd initial_angle_dd = initial_angle*r2d; ///degree
+    std::cout << "initial_angle : " << initial_angle << std::endl;
+    std::cout << "initial_angle_dd : " << initial_angle_dd << std::endl;
+
+//
+//    for(int i=3; i<6; i++){
+//        goal_pose[i] = d2r*goal_pose[i];
+//    }
+    std::cout << "delta_X : " << delta_X << std::endl;
+    int count = 0;
+    while((delta_X.array().abs().maxCoeff() > epsilon)){
+        if(count == 0){
+            Task_cur=ComputeFK(initial_angle_dd); ///degree
+            delta_X << step_size*(goal_pose-Task_cur);
+            getJacobian(initial_angle);  ///update jacobian for every tik, initial angle : radian
+            Inv_J = J.inverse();
+            std::cout << delta_X << std::endl;
+            Joint_cur << initial_angle_dd+Inv_J*delta_X; ///degree
+            count++;
+        }
+        else{
+            Task_cur = ComputeFK(Joint_cur);
+            delta_X = step_size*(goal_pose-Task_cur);
+            Joint_cur = Joint_cur*d2r;
+            getJacobian(Joint_cur);  ///update jacobian for every tik, initial angle : radian
+            Inv_J = J.inverse();
+//            std::cout << Inv_J << std::endl;
+            Joint_cur = Joint_cur*r2d;
+//            std::cout << "Joint_cur : " << Joint_cur << std::endl;
+            Joint_cur << Joint_cur+Inv_J*delta_X; ///degree
+        }
+//        std::cout << "computing" << std::endl;
+    }
+    std::cout << "While ended" << std::endl;
+    std::cout << "IK checking!!! : computed Joints" << std::endl;
+    std::cout << Joint_cur << std::endl; ///degree
+    std::cout << "Check IK value using joints" << std::endl;
+    std::cout << ComputeFK(Joint_cur); ///degree
 
 }
 

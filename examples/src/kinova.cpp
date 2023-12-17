@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
     control kinovaControl;
     Eigen::VectorXd FKresult(6);
     Eigen::VectorXd Goalposition(6);
-    Goalposition << 0,0,0, 1,1,1;
+    Goalposition << -0.232893,-0.453875,1.07644,94.9278,-4.98094,-80.4369;
 
     /// set controller
     robotController controller;
@@ -121,10 +121,10 @@ int main(int argc, char* argv[]) {
 //            std::cout << vel;
 //            std::cout << angvel << std::endl;
 
-            jointvelocity = kinova->getGeneralizedVelocity(); ///joint velocity
-            for(int i=0; i<6; i++){
-                jointvel[i] = jointvelocity[i]; ///change to Eigen vector
-            }
+//            jointvelocity = kinova->getGeneralizedVelocity(); ///joint velocity
+//            for(int i=0; i<6; i++){
+//                jointvel[i] = jointvelocity[i]; ///change to Eigen vector
+//            }
 //            std::cout << "2. jointvelocity" << std::endl;
 //            std::cout << jointvel << std::endl;
 

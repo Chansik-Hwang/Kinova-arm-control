@@ -79,7 +79,7 @@ void robotController::setFixedBasePosition(raisim::World* world, raisim::Articul
     std::cout << "goalPosition  :  ";
     for (int i = 0; i < robot->getGeneralizedCoordinateDim(); i++)
     {
-        std::cout << goalPosition[i];
+        std::cout << goalPosition[i] << " ";
     }
 
     /// create trajectory

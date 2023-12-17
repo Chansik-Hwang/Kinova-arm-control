@@ -17,8 +17,8 @@ class control{
 private:
     Eigen::Matrix3d R01,R12,R23,R34,R45,R56,R67;
     Eigen::Matrix4d T01,T12,T23,T34,T45,T56,T67;
-    double d2r = PI/180;
-    double r2d = 180/PI;
+    double d2r = PI/180.0;
+    double r2d = 180.0/PI;
 
     Eigen::MatrixXd Jacobian_v;
     Eigen::MatrixXd Jacobian_w;
