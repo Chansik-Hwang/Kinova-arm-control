@@ -115,6 +115,12 @@
         <mesh filename="../meshes/ring_big.STL"/>
       </geometry>
     </visual>
+    <collision>
+      <geometry>
+        <cylinder length = "0.14" radius="0.015" />
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 -0.01 -0.07"/>
+    </collision>
     <inertial>
       <mass value="0.7477"/>
       <origin xyz="0 -0.002 -0.0605"/>
@@ -224,6 +230,12 @@
       </geometry>
     </visual>
     --&gt;
+    <collision>
+      <geometry>
+        <cylinder length = "0.03" radius="0.03" />
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 -0.023"/>
+    </collision>
 
     <inertial>
       <mass value="0.463"/>
