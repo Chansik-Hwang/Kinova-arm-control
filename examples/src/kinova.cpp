@@ -67,60 +67,54 @@ int main(int argc, char* argv[]) {
 
     Eigen::VectorXd jointPgain(kinova->getDOF()), jointDgain(kinova->getDOF());
     Eigen::VectorXd initialJointPosition(kinova->getGeneralizedCoordinateDim());
-    Eigen::VectorXd initialJointPosition2(cup->getGeneralizedCoordinateDim());
-//    Eigen::VectorXd Table_initialJointPosition(newtable->getGeneralizedCoordinateDim());
+    Eigen::VectorXd CupJointPosition(cup->getGeneralizedCoordinateDim());
     Eigen::VectorXd cupVelocity(cup->getDOF());
 
     cupVelocity.setZero();
 
     initialJointPosition << 1.22173,1.22173,1.22173,1.22173,1.22173,0;
-    initialJointPosition2 << 0, 0.2, 0.0, 1.57, 0, 0,1;
-//    Table_initialJointPosition.setZero();
+    CupJointPosition << -0.5,0.55,1.5, 1.57, 0, 0,1;  /// z = 0.454 cup is on the table
 
     float timeDuration = 3.0; /// 정하는 기준?
     jointPgain << 80.0, 80.0, 80.0, 40.0, 40.0, 40.0;
     jointDgain << 2.0, 2.0, 2.0, 0.5, 0.5, 0.5;
 
 
-    cup->setGeneralizedCoordinate(initialJointPosition2);
+    cup->setGeneralizedCoordinate(CupJointPosition);
     cup->setGeneralizedForce(Eigen::VectorXd::Zero(cup->getDOF()));
     cup->setPdGains(jointPgain, jointDgain);
-    cup->setPdTarget(initialJointPosition2, cupVelocity);
+    cup->setPdTarget(CupJointPosition, cupVelocity);
 
     controller.setInitialState(kinova, initialJointPosition); /// joint 6개 초기각도 0세팅
     controller.setPDgain(jointPgain,jointDgain); ///각 joint 별로 P,D게인 설정
 
     /// make trajectory and run
     char run;
-    while (1)
+
+    std::cout << "\nInput joints(1~6) : ";
+    std::cin >> run;
+    if (run == 'y')
     {
-        std::cout << "\nDo you want to keep going? [y/n]  ";
-        std::cin >> run;
-        if (run == 'y')
-        {
-            controller.setFixedBasePosition(&world, kinova, timeDuration);
+        controller.setFixedBasePosition(&world, kinova, timeDuration);
 
-            kinova->getFrameOrientation(endeffectorIndex,rotationcheck);
-            kinova->getFramePosition(endeffectorIndex,position);
-            kinova->getFrameVelocity(endeffectorIndex,vel);
-            kinova->getFrameAngularVelocity(endeffectorIndex,angvel);
+        kinova->getFrameOrientation(endeffectorIndex,rotationcheck);
+        kinova->getFramePosition(endeffectorIndex,position);
+        kinova->getFrameVelocity(endeffectorIndex,vel);
+        kinova->getFrameAngularVelocity(endeffectorIndex,angvel);
 
+        FKresult << kinovaControl.ComputeFK(controller.JointSpaceInput);
 
-
-            FKresult << kinovaControl.ComputeFK(controller.JointSpaceInput);
-
-            std::cout << "x y z r p y(degree) : ";
-            FKresult[3] = FKresult[3]*180/PI;
-            FKresult[4] = FKresult[4]*180/PI;
-            FKresult[5] = FKresult[5]*180/PI;
-
-            for(int i=0; i<kinova->getDOF(); i++){
-                std::cout << FKresult[i] << "  ";
-            }
-            std::cout << std::endl;
-            std::cout << "real x y z : " << position[0] << " "<< position[1]<< " " << position[2]<< std::endl;
-            std::cout << "real orientation" << std::endl;
-            std::cout << rotationcheck << std::endl;
+        std::cout << "x y z r p y(degree) : ";
+        FKresult[3] = FKresult[3]*180/PI;
+        FKresult[4] = FKresult[4]*180/PI;
+        FKresult[5] = FKresult[5]*180/PI;
+        for(int i=0; i<kinova->getDOF(); i++){
+            std::cout << FKresult[i] << "  ";
+        }
+        std::cout << std::endl;
+        std::cout << "real x y z : " << position[0] << " "<< position[1]<< " " << position[2]<< std::endl;
+        std::cout << "real orientation" << std::endl;
+        std::cout << rotationcheck << std::endl;
 
 //            std::cout << "1. linear,angular velocity" << std::endl;
 //            std::cout << vel;
@@ -133,21 +127,20 @@ int main(int argc, char* argv[]) {
 //            std::cout << "2. jointvelocity" << std::endl;
 //            std::cout << jointvel << std::endl;
 
-            kinovaControl.ComputeIK(controller.JointSpaceInput,Goalposition,kinova);
+        kinovaControl.ComputeIK(controller.JointSpaceInput,Goalposition,kinova);
 
 //            std::cout << "3. J*jointvelocity computed" << std::endl;
 //            computedvel << kinovaControl.JointSpaceInputJ*jointvel;
 //            std::cout << computedvel << std::endl;
 
 //            setObstacle.setSphere(&world, 0.04, 1, joint2position[0], joint2position[1], joint2position[2]); for FK position check
-        }
-
-        else
-        {
-            std::cout << "Bye. Please quit. " << std::endl;
-            break;
-        }
     }
+
+    else
+    {
+        std::cout << "Bye. Please quit. " << std::endl;
+    }
+
 
     for (int i=0; i<2000000; i++)
     {

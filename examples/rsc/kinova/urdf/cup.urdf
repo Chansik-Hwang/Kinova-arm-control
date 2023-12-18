@@ -3,7 +3,7 @@
 
   <link name="base">
     <visual>
-      <origin rpy="0 0 0" xyz="0.3 0.7 0.405"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
         <box size="0.001 0.001 0.001"/>
       </geometry>
@@ -24,12 +24,12 @@
 
   <link name="cup">
     <inertial>
-       <origin xyz="0.55 1.24 0.75" rpy="0 0 0"/>
-       <mass value = "1.293"/>
+       <origin xyz="0 0 0" rpy="0 0 0"/>
+       <mass value = "0.05"/>
        <inertia ixx = "0.1" ixy = "0" ixz = "0" iyx = "0" iyy = "0.1" iyz = "0" izx = "0" izy = "0" izz = "0.1"/>
     </inertial>
     <visual>
-      <origin rpy="1.57 0 0" xyz="0.3 0.7 0.455"/>
+      <origin rpy="1.57 0 0" xyz="0 0 0"/>
       <geometry>
            <mesh filename="../meshes/cup.stl" scale="0.001 0.001 0.001"/>
       </geometry>
@@ -39,7 +39,7 @@
       <geometry>
 	 	 <mesh filename="../meshes/cup.obj" scale="0.001 0.001 0.001"/>
       </geometry>
-      <origin rpy="1.57 0 0" xyz="0.3 0.7 0.454"/>
+      <origin rpy="1.57 0 0" xyz="0 0 0"/>
     </collision>
   </link>
 
