@@ -63,7 +63,7 @@ void robotController::setFixedBasePosition(raisim::World* world, raisim::Articul
 
     /// set time
     setTime.setTimeInitiallize();
-    setTime.timedT = 0.02;
+    setTime.timedT = 0.01;
 
     /// set joint goal position
     std::cout << " " << std::endl;
@@ -102,7 +102,7 @@ void robotController::setFixedBasePosition(raisim::World* world, raisim::Articul
 
         robot->setGeneralizedForce(Eigen::VectorXd::Zero(robot->getDOF()));
         world->integrate();
-        usleep(10000);
+        usleep(5000);
         if (setTime.localtime == timeDuration)
             break;
     }
@@ -112,6 +112,9 @@ void robotController::setFixedBasePosition(raisim::World* world, raisim::Articul
 //    for(int i=0; i<6; i++){
 //        std::cout << JointSpaceInput[i] << " ";
 //    }
+    std::cout << std::endl;
+    std::cout << "world time check : " << world->getWorldTime() << std::endl;
+
     std::cout << "\n" <<  "robot current position  :  " << robot->getGeneralizedCoordinate() << std::endl;
 }
 

@@ -52,15 +52,15 @@ int main(int argc, char* argv[]) {
     /// set obstacle
     setObstacle setObstacle;
 
-    setObstacle.setBox(&world,0.3,0.3,0.4,0.7,-0.7,0.2);
-    setObstacle.setBox(&world,0.3,0.3,0.4,-0.7,-0.7,0.2);
-    setObstacle.setBox(&world,1.4,0.3,0.05,0,-0.7,0.425);
+//    setObstacle.setBox(&world,0.3,0.3,0.4,0.7,-0.7,0.2);
+//    setObstacle.setBox(&world,0.3,0.3,0.4,-0.7,-0.7,0.2);
+//    setObstacle.setBox(&world,1.4,0.3,0.05,0,-0.7,0.425);
 
     control kinovaControl;
     Eigen::VectorXd FKresult(6);
     Eigen::VectorXd Goalposition(6);
-    Goalposition << -0.183615, -0.488176, 1.01955, 100.06, -9.84657, -71.7538; ///degree
-
+//    Goalposition << -0.183615, -0.488176, 1.01955, 100.06, -9.84657, -71.7538; ///degree
+    Goalposition << -0.5,0.6,1, 0,0,0; ///degree
 
     /// set controller
     robotController controller;
@@ -72,10 +72,10 @@ int main(int argc, char* argv[]) {
 
     cupVelocity.setZero();
 
-    initialJointPosition << 1.22173,1.22173,1.22173,1.22173,1.22173,0;
-    CupJointPosition << -0.5,0.55,1.5, 1.57, 0, 0,1;  /// z = 0.454 cup is on the table
+    initialJointPosition << 0.523599,1.57,1.57,1.57,1.57,1.57; /// All joints set to 60'
+    CupJointPosition << -0.4,0.5,1.3, 1.57, 0, 0,1;  /// z = 0.454 cup is on the table
 
-    float timeDuration = 3.0; /// 정하는 기준?
+    float timeDuration = 2; /// 정하는 기준?
     jointPgain << 80.0, 80.0, 80.0, 40.0, 40.0, 40.0;
     jointDgain << 2.0, 2.0, 2.0, 0.5, 0.5, 0.5;
 
@@ -91,58 +91,57 @@ int main(int argc, char* argv[]) {
     /// make trajectory and run
     char run;
 
-    std::cout << "\nInput joints(1~6) : ";
-    std::cin >> run;
-    if (run == 'y')
-    {
-        controller.setFixedBasePosition(&world, kinova, timeDuration);
+//    while(1) {
+//        std::cout << "\nStrike the Obstacle(y/n) : ";
+//        std::cin >> run;
+//        if (run == 'y') {
+            controller.setFixedBasePosition(&world, kinova, timeDuration);
 
-        kinova->getFrameOrientation(endeffectorIndex,rotationcheck);
-        kinova->getFramePosition(endeffectorIndex,position);
-        kinova->getFrameVelocity(endeffectorIndex,vel);
-        kinova->getFrameAngularVelocity(endeffectorIndex,angvel);
+            kinova->getFrameOrientation(endeffectorIndex, rotationcheck);
+            kinova->getFramePosition(endeffectorIndex, position);
+            kinova->getFrameVelocity(endeffectorIndex, vel);
+            kinova->getFrameAngularVelocity(endeffectorIndex, angvel);
 
-        FKresult << kinovaControl.ComputeFK(controller.JointSpaceInput);
+            FKresult << kinovaControl.ComputeFK(controller.JointSpaceInput);
 
-        std::cout << "x y z r p y(degree) : ";
-        FKresult[3] = FKresult[3]*180/PI;
-        FKresult[4] = FKresult[4]*180/PI;
-        FKresult[5] = FKresult[5]*180/PI;
-        for(int i=0; i<kinova->getDOF(); i++){
-            std::cout << FKresult[i] << "  ";
-        }
-        std::cout << std::endl;
-        std::cout << "real x y z : " << position[0] << " "<< position[1]<< " " << position[2]<< std::endl;
-        std::cout << "real orientation" << std::endl;
-        std::cout << rotationcheck << std::endl;
+            std::cout << "x y z r p y(degree) : ";
+            FKresult[3] = FKresult[3] * 180 / PI;
+            FKresult[4] = FKresult[4] * 180 / PI;
+            FKresult[5] = FKresult[5] * 180 / PI;
+            for (int i = 0; i < kinova->getDOF(); i++) {
+                std::cout << FKresult[i] << "  ";
+            }
+            std::cout << std::endl;
+            std::cout << "real x y z : " << position[0] << " " << position[1] << " " << position[2] << std::endl;
+            std::cout << "real orientation" << std::endl;
+            std::cout << rotationcheck << std::endl;
 
-//            std::cout << "1. linear,angular velocity" << std::endl;
-//            std::cout << vel;
-//            std::cout << angvel << std::endl;
+            //            std::cout << "1. linear,angular velocity" << std::endl;
+            //            std::cout << vel;
+            //            std::cout << angvel << std::endl;
 
-//            jointvelocity = kinova->getGeneralizedVelocity(); ///joint velocity
-//            for(int i=0; i<6; i++){
-//                jointvel[i] = jointvelocity[i]; ///change to Eigen vector
-//            }
-//            std::cout << "2. jointvelocity" << std::endl;
-//            std::cout << jointvel << std::endl;
+            //            jointvelocity = kinova->getGeneralizedVelocity(); ///joint velocity
+            //            for(int i=0; i<6; i++){
+            //                jointvel[i] = jointvelocity[i]; ///change to Eigen vector
+            //            }
+            //            std::cout << "2. jointvelocity" << std::endl;
+            //            std::cout << jointvel << std::endl;
 
-        kinovaControl.ComputeIK(controller.JointSpaceInput,Goalposition,kinova);
+            //        kinovaControl.ComputeIK(controller.JointSpaceInput,Goalposition,kinova);
 
-//            std::cout << "3. J*jointvelocity computed" << std::endl;
-//            computedvel << kinovaControl.JointSpaceInputJ*jointvel;
-//            std::cout << computedvel << std::endl;
+            //            std::cout << "3. J*jointvelocity computed" << std::endl;
+            //            computedvel << kinovaControl.JointSpaceInputJ*jointvel;
+            //            std::cout << computedvel << std::endl;
 
-//            setObstacle.setSphere(&world, 0.04, 1, joint2position[0], joint2position[1], joint2position[2]); for FK position check
-    }
+            //            setObstacle.setSphere(&world, 0.04, 1, joint2position[0], joint2position[1], joint2position[2]); for FK position check
+//        }
+//        else {
+//            std::cout << "Entire Process End" << std::endl;
+//            break;
+//        }
+//    }
 
-    else
-    {
-        std::cout << "Bye. Please quit. " << std::endl;
-    }
-
-
-    for (int i=0; i<2000000; i++)
+    for (int i=0; i<2000000; i++)         ///raisim 시간흘러가며 유지]
     {
         RS_TIMED_LOOP(int(world.getTimeStep()*1e6))
         server.integrateWorldThreadSafe();
