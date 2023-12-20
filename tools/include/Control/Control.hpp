@@ -4,7 +4,7 @@
 
 #ifndef EE3100704_PROJECTS_CONTROL_HPP
 #define EE3100704_PROJECTS_CONTROL_HPP
-#define PI 3.141592
+#define PI 3.14159265358979
 
 #include <Eigen/Eigen>
 #include <cmath>

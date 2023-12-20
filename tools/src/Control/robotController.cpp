@@ -54,7 +54,8 @@ void robotController::setFixedBasePosition(raisim::World* world, raisim::Articul
     Eigen::VectorXd goalPosition(robot->getGeneralizedCoordinateDim());
     Eigen::VectorXd jointPositionTarget(robot->getGeneralizedCoordinateDim()), jointVelocityTarget(robot->getDOF());
     Eigen::VectorXd currentPosition(robot->getGeneralizedCoordinateDim());
-
+    Eigen::VectorXd Force(robot->getDOF());
+    Force << 40, 40, 40, 40, 40,40;
     /// get joint current state
     for (int i = 0; i < robot->getDOF(); i++)
     {
@@ -100,10 +101,10 @@ void robotController::setFixedBasePosition(raisim::World* world, raisim::Articul
         /// robot set position
         robot->setGeneralizedCoordinate(jointPositionTarget);
 
-        robot->setGeneralizedForce(Eigen::VectorXd::Zero(robot->getDOF()));
+        robot->setGeneralizedForce(Force);
         world->integrate();
         usleep(5000);
-        if (setTime.localtime == timeDuration)
+        if (setTime.localtime >= timeDuration)
             break;
     }
     robot->setPdGains(mPgain, mDgain);
@@ -113,7 +114,7 @@ void robotController::setFixedBasePosition(raisim::World* world, raisim::Articul
 //        std::cout << JointSpaceInput[i] << " ";
 //    }
     std::cout << std::endl;
-    std::cout << "world time check : " << world->getWorldTime() << std::endl;
+//    std::cout << "world time check : " << world->getWorldTime() << std::endl;
 
     std::cout << "\n" <<  "robot current position  :  " << robot->getGeneralizedCoordinate() << std::endl;
 }

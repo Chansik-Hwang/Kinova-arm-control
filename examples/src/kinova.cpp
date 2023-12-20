@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
     Eigen::VectorXd FKresult(6);
     Eigen::VectorXd Goalposition(6);
 //    Goalposition << -0.183615, -0.488176, 1.01955, 100.06, -9.84657, -71.7538; ///degree
-    Goalposition << -0.5,0.6,1, 0,0,0; ///degree
+    Goalposition << 0.478747,0.64008, 1.19644, 32.9011,-62.6701,-176.539; ///degree
 
     /// set controller
     robotController controller;
@@ -72,10 +72,12 @@ int main(int argc, char* argv[]) {
 
     cupVelocity.setZero();
 
-    initialJointPosition << 0.523599,1.57,1.57,1.57,1.57,1.57; /// All joints set to 60'
-    CupJointPosition << -0.4,0.5,1.3, 1.57, 0, 0,1;  /// z = 0.454 cup is on the table
+    initialJointPosition << 90,90,90,0,90,0;
+    initialJointPosition = PI/180 * initialJointPosition;
 
-    float timeDuration = 2; /// 정하는 기준?
+    CupJointPosition << 0.3,0.7,1.1, 1.57, 0, 0,1;  /// z = 0.454 cup is on the table
+
+    float timeDuration = 1.3; /// 정하는 기준?
     jointPgain << 80.0, 80.0, 80.0, 40.0, 40.0, 40.0;
     jointDgain << 2.0, 2.0, 2.0, 0.5, 0.5, 0.5;
 
@@ -104,7 +106,7 @@ int main(int argc, char* argv[]) {
 
             FKresult << kinovaControl.ComputeFK(controller.JointSpaceInput);
 
-            std::cout << "x y z r p y(degree) : ";
+            std::cout << "x y z r p y(degree, by FK) : ";
             FKresult[3] = FKresult[3] * 180 / PI;
             FKresult[4] = FKresult[4] * 180 / PI;
             FKresult[5] = FKresult[5] * 180 / PI;
@@ -112,8 +114,8 @@ int main(int argc, char* argv[]) {
                 std::cout << FKresult[i] << "  ";
             }
             std::cout << std::endl;
-            std::cout << "real x y z : " << position[0] << " " << position[1] << " " << position[2] << std::endl;
-            std::cout << "real orientation" << std::endl;
+            std::cout << "x y z(by Raisim Function) : " << position[0] << " " << position[1] << " " << position[2] << std::endl;
+            std::cout << "Orientation(by Raisim Function)" << std::endl;
             std::cout << rotationcheck << std::endl;
 
             //            std::cout << "1. linear,angular velocity" << std::endl;
@@ -127,7 +129,7 @@ int main(int argc, char* argv[]) {
             //            std::cout << "2. jointvelocity" << std::endl;
             //            std::cout << jointvel << std::endl;
 
-            //        kinovaControl.ComputeIK(controller.JointSpaceInput,Goalposition,kinova);
+//            kinovaControl.ComputeIK(controller.JointSpaceInput,Goalposition,kinova);
 
             //            std::cout << "3. J*jointvelocity computed" << std::endl;
             //            computedvel << kinovaControl.JointSpaceInputJ*jointvel;

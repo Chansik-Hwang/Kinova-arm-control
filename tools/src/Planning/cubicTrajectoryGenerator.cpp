@@ -5,7 +5,7 @@
 #include "Planning/cubicTrajectoryGenerator.hpp"
 
 void cubicTrajectoryGenerator::updateTrajectory(double currentPosition, double goalPosition, double currentTime, double timeDuration) {
-    mFunctionValue << currentPosition, goalPosition, 0.0, 10.0;
+    mFunctionValue << currentPosition, goalPosition, 0.0, 3.0;
     mReferenceTime = currentTime;
     mTimeDuration = timeDuration;
     calculateCoefficient();
