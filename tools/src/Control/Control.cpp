@@ -336,7 +336,7 @@ void control::JointPDControl(Eigen::VectorXd IKJoints, raisim::World* world, rai
 
     mPgain << 80.0, 80.0, 80.0, 40.0, 40.0, 40.0;
     mDgain << 2.0, 2.0, 2.0, 0.5, 0.5, 0.5;
-    Eigen::VectorXd goalPosition(robot->getGeneralizedCoordinateDim());
+    Eigen::VectorXd Reference_pose(robot->getGeneralizedCoordinateDim());
     Eigen::VectorXd jointPositionTarget(robot->getGeneralizedCoordinateDim()), jointVelocityTarget(robot->getDOF());
     Eigen::VectorXd currentPosition(robot->getGeneralizedCoordinateDim());
     Eigen::VectorXd Force(robot->getDOF());
@@ -354,19 +354,19 @@ void control::JointPDControl(Eigen::VectorXd IKJoints, raisim::World* world, rai
 
     /// set joint goal position
     std::cout << " " << std::endl;
-    goalPosition = IKJoints; ///radian
+    Reference_pose = IKJoints; ///radian
 
     /// check goal position
-    std::cout << "goalPosition  :  ";
+    std::cout << "Reference_pose  :  ";
     for (int i = 0; i < robot->getGeneralizedCoordinateDim(); i++)
     {
-        std::cout << goalPosition[i] << " ";
+        std::cout << Reference_pose[i] << " ";
     }
 
     /// create trajectory
     for (int i = 0; i < robot->getGeneralizedCoordinateDim(); i++)
     {
-        trajectoryGenerator[i].updateTrajectory(currentPosition[i],goalPosition[i],setTime.localtime,timeDuration)  ;
+        trajectoryGenerator[i].updateTrajectory(currentPosition[i],Reference_pose[i],setTime.localtime,timeDuration)  ;
     } ///calculate the Coefficient for cubic
 
     while (1)

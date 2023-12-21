@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+<robot name = "treshcan">
+
+  <link name="world"/>
+
+  <joint name="world_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="1.2 1.62 0"/>
+    <parent link="world"/>
+    <child link="treshcan"/>
+  </joint>
+
+  <link name="treshcan">
+    <inertial>
+       <origin xyz="0 0 0.0" rpy="0 0 0"/>
+       <mass value = "0.05"/>
+       <inertia ixx = "0.1" ixy = "0" ixz = "0" iyx = "0" iyy = "0.1" iyz = "0" izx = "0" izy = "0" izz = "0.1"/>
+    </inertial>
+    <visual>
+      <origin rpy="1.57 0 0" xyz="0 0 0.05"/>
+      <geometry>
+           <mesh filename="../meshes/cup.stl" scale="0.0023 0.0023 0.0023"/>
+      </geometry>
+      <material name="Emerald">
+      <color rgba="0.0784313 0.858823 0.552941 0.68"/>
+      </material>
+    </visual>
+
+    <collision>
+      <geometry>
+	 	 <mesh filename="../meshes/cup.obj" scale="0.0023 0.0023 0.0023"/>
+      </geometry>
+      <origin rpy="1.57 0 0" xyz="0 0 0"/>
+    </collision>
+  </link>
+
+  <joint name="temp" type=revolute>
+    <axis xyz="0 0 1"/>
+    <parent link="treshcan"/>
+    <child link="small_link"/>
+  </joint>
+
+  <link name="small_link">
+    <visual>
+      <geometry>
+        <box size = "0.001 0.001 0.001"/>
+      </geometry>
+    </visual>
+  </link>
+
+</robot>

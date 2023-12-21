@@ -14,7 +14,7 @@ public:
     {
         mMatrixA << 2.0, -2.0, 1.0, 1.0, -3.0, 3.0, -2.0, -1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0;
     }
-    void updateTrajectory(double currentPosition,double goalPosition,double currentTime,double timeDuration);
+    void updateTrajectory(double currentPosition,double Reference_pose,double currentTime,double timeDuration);
     void calculateCoefficient();
     double getPositionTrajectory(double currentTime);
     double getVelocityTrajectory(double currentTime);

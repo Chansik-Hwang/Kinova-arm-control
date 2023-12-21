@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
     auto kinova = world.addArticulatedSystem("/home/chansik/EE3100704/examples/rsc/kinova/urdf/kinova.urdf"); //set your path
     auto cup = world.addArticulatedSystem("/home/chansik/EE3100704/examples/rsc/kinova/urdf/cup.urdf");
     auto newtable = world.addArticulatedSystem("/home/chansik/EE3100704/examples/rsc/kinova/urdf/newtable.urdf");
-
+    auto treshcan = world.addArticulatedSystem("/home/chansik/EE3100704/examples/rsc/kinova/urdf/treshcan.urdf");
     auto endeffectorIndex = kinova->getFrameIdxByLinkName("kinova_end_effector");
 
 
@@ -45,17 +45,18 @@ int main(int argc, char* argv[]) {
     kinova->setName("kinova");
     cup->setName("cup");
     newtable->setName("newtable");
-    std::cout << newtable->getDOF();
+    treshcan->setName("treshcan");
+
 
 //    sleep(2);
 
     control kinovaControl;
     Eigen::VectorXd FKresult(6);
-    Eigen::VectorXd Goalposition(6);          /// degree
-//    Goalposition << 0.478747,0.64008, 1.19644, 32.9011,-62.6701,-176.539; ///degree 300 90 120 30 140 0
-    Goalposition << -0.708552,-0.0289104, 1.25142, 79.2681,-6.42481,-97.8791; ///degree 300 90 120 30 140 0
+    Eigen::VectorXd Reference_pose(6);          /// degree
+    Reference_pose << 0.478747,0.64008, 1.19644, 32.9011,-62.6701,-176.539; ///degree 300 90 120 30 140 0 에 대한 task space
+
     Eigen::VectorXd test(6);
-    test << 170, 100, 110, 20, 110, 80;
+    test << 300, 90, 120, 30, 140, 0;
     test = PI/180 * test;
     /// set controller
     robotController controller;
@@ -64,6 +65,7 @@ int main(int argc, char* argv[]) {
     Eigen::VectorXd initialJointPosition(kinova->getGeneralizedCoordinateDim());
     Eigen::VectorXd CupJointPosition(cup->getGeneralizedCoordinateDim());
     Eigen::VectorXd cupVelocity(cup->getDOF());
+    Eigen::VectorXd treshcanPosition(treshcan->getGeneralizedCoordinateDim());
 
     cupVelocity.setZero();
 
@@ -93,12 +95,14 @@ int main(int argc, char* argv[]) {
 //        if (run == 'y') {
 
 //    controller.setFixedBasePosition(&world, kinova, timeDuration);
-//    kinova->getFrameOrientation(endeffectorIndex, rotationcheck);
-//    kinova->getFramePosition(endeffectorIndex, position);
-//    kinova->getFrameVelocity(endeffectorIndex, vel);
-//    kinova->getFrameAngularVelocity(endeffectorIndex, angvel);
+    sleep(3);
+    kinovaControl.JointPDControl(test, &world, kinova, timeDuration);
+    kinova->getFrameOrientation(endeffectorIndex, rotationcheck);
+    kinova->getFramePosition(endeffectorIndex, position);
+    kinova->getFrameVelocity(endeffectorIndex, vel);
+    kinova->getFrameAngularVelocity(endeffectorIndex, angvel);
 
-//    FKresult << kinovaControl.ComputeFK(test);
+    FKresult << kinovaControl.ComputeFK(test);
 
     std::cout << "x y z r p y(degree, by FK) : ";
     FKresult[3] = FKresult[3] * 180 / PI;
@@ -107,10 +111,10 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < kinova->getDOF(); i++) {
         std::cout << FKresult[i] << "  ";
     }
-//    std::cout << std::endl;
-//    std::cout << "x y z(by Raisim Function) : " << position[0] << " " << position[1] << " " << position[2] << std::endl;
-//    std::cout << "Orientation(by Raisim Function)" << std::endl;
-//    std::cout << rotationcheck << std::endl;
+    std::cout << std::endl;
+    std::cout << "x y z(by Raisim Function) : " << position[0] << " " << position[1] << " " << position[2] << std::endl;
+    std::cout << "Orientation(by Raisim Function)" << std::endl;
+    std::cout << rotationcheck << std::endl;
 //                        std::cout << "1. Task space velocity" << std::endl;
 //                        std::cout << vel;
 //                        std::cout << angvel << std::endl;
@@ -121,9 +125,7 @@ int main(int argc, char* argv[]) {
 //                        }
 //                        std::cout << "2. joint velocity" << std::endl;
 //                        std::cout << jointvel << std::endl;
-    sleep(2);
-    Goalposition = kinovaControl.ComputeIK(initialJointPosition,Goalposition,kinova);
-    kinovaControl.JointPDControl(Goalposition, &world, kinova, timeDuration);
+//    Reference_pose = kinovaControl.ComputeIK(initialJointPosition,Reference_pose,kinova);
 
 //                        std::cout << "3. J*jointvelocity computed" << std::endl;
 //                        computedvel << kinovaControl.testJ*jointvel;
