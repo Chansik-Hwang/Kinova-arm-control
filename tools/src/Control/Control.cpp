@@ -198,23 +198,23 @@ void control::getOrientation(Eigen::MatrixXd Tmatrix, Eigen::VectorXd &FKvalue){
     FKvalue[5] = Yaw;
 }
 
-void control::ComputeIK(Eigen::VectorXd &initial_angle, Eigen::VectorXd goal_pose,raisim::ArticulatedSystem *robot){
+Eigen::VectorXd control::ComputeIK(Eigen::VectorXd &initial_angle, Eigen::VectorXd goal_pose,raisim::ArticulatedSystem *robot){
 
-
-    double epsilon = 0.000001;
-    double step_size = 0.005;
+//    double epsilon = 0.000001;
+//    double step_size = 0.005;
+    double epsilon = 0.00001; /// 0.003       150 80 90 0 90 60 기준
+    double step_size = 0.05;/// 0.02   현재 150 80 90 0 90 60 실험 중
     Eigen::VectorXd delta_X(robot->getDOF());
     Eigen::VectorXd Task_cur(robot->getDOF());
     Eigen::VectorXd Joint_cur(robot->getDOF());
-    Eigen::VectorXd initial_angle_d = initial_angle*r2d; ///degree
-    Eigen::VectorXd IK_TestVal(6);
+    Eigen::VectorXd IK_TestVal(robot->getDOF());
 
     for(int i=3; i<6; i++){
         goal_pose[i] = d2r*goal_pose[i]; /// goal pose: degree -> radian, initial angle : radian
     }
 
     std::cout << "Task_cur : " << std::endl;
-    Task_cur=ComputeFK(initial_angle); ///degree
+    Task_cur=ComputeFK(initial_angle);
     std::cout << Task_cur << std::endl;
 
     std::cout << "goal_pose : " << std::endl;
@@ -224,23 +224,28 @@ void control::ComputeIK(Eigen::VectorXd &initial_angle, Eigen::VectorXd goal_pos
     std::cout << "delta_x " << std::endl;
     std::cout << delta_X << std::endl;
 
-    int count = 0;
+    LoopCount = 0;
     while((delta_X.array().abs().maxCoeff() > epsilon)){
-        if(count == 0){
-            std::cout << "Hello" << std::endl;
+        if(LoopCount == 0){
+            std::cout << "Wait..." << std::endl;
             getJacobian(initial_angle);  ///update jacobian for every tik, initial angle : radian
             Inv_J = J.inverse();
-            Joint_cur << initial_angle+Inv_J*delta_X; ///degree
-            count++;
+            Joint_cur << initial_angle+Inv_J*delta_X;
+            LoopCount++;
         }
         else{
             Task_cur = ComputeFK(Joint_cur);
             delta_X = step_size*(goal_pose-Task_cur);
-            std::cout << "Descending..." << std::endl;
+//            std::cout << "Descending..." << std::endl;
             getJacobian(Joint_cur);  ///update jacobian for every tik, initial angle : radian
             Inv_J = J.inverse();
 //            std::cout << Inv_J << std::endl;
-            Joint_cur << Joint_cur+Inv_J*delta_X; ///degree
+            std::cout << "----------------------" << std::endl;
+            std::cout << delta_X << std::endl;
+            Joint_cur << Joint_cur+Inv_J*delta_X;
+            LoopCount++;
+//            if(LoopCount >= 50000)
+//                break;
         }
     }
     IK_TestVal << ComputeFK(Joint_cur);
@@ -250,9 +255,10 @@ void control::ComputeIK(Eigen::VectorXd &initial_angle, Eigen::VectorXd goal_pos
 
     std::cout << "While ended" << std::endl;
     std::cout << "IK checking!!! : computed Joints" << std::endl;
-    std::cout << Joint_cur << std::endl; ///degree
-    std::cout << "Check IK value using joints" << std::endl;
-    std::cout << IK_TestVal << std::endl;
+    std::cout << Joint_cur*180/PI << std::endl; ///degree
+//    std::cout << "Check FK value using IK computed joints" << std::endl;
+//    std::cout << IK_TestVal << std::endl;
+    return Joint_cur;
 }
 
 void control::getJacobian(Eigen::VectorXd &th){
@@ -323,5 +329,78 @@ void control::getJacobian(Eigen::VectorXd &th){
 
     testJ << J;
 }
+
+void control::JointPDControl(Eigen::VectorXd IKJoints, raisim::World* world, raisim::ArticulatedSystem *robot, float timeDuration){
+    cubicTrajectoryGenerator trajectoryGenerator[robot->getDOF()];
+    setTime setTime;
+
+    mPgain << 80.0, 80.0, 80.0, 40.0, 40.0, 40.0;
+    mDgain << 2.0, 2.0, 2.0, 0.5, 0.5, 0.5;
+    Eigen::VectorXd goalPosition(robot->getGeneralizedCoordinateDim());
+    Eigen::VectorXd jointPositionTarget(robot->getGeneralizedCoordinateDim()), jointVelocityTarget(robot->getDOF());
+    Eigen::VectorXd currentPosition(robot->getGeneralizedCoordinateDim());
+    Eigen::VectorXd Force(robot->getDOF());
+    Force <<25, 25, 25, 25, 25,25;
+//    Force.setZero();
+    /// get joint current state
+    for (int i = 0; i < robot->getDOF(); i++)
+    {
+        currentPosition(i) = robot->getGeneralizedCoordinate()[i] ;
+    }
+
+    /// set time
+    setTime.setTimeInitiallize();
+    setTime.timedT = 0.01;
+
+    /// set joint goal position
+    std::cout << " " << std::endl;
+    goalPosition = IKJoints; ///radian
+
+    /// check goal position
+    std::cout << "goalPosition  :  ";
+    for (int i = 0; i < robot->getGeneralizedCoordinateDim(); i++)
+    {
+        std::cout << goalPosition[i] << " ";
+    }
+
+    /// create trajectory
+    for (int i = 0; i < robot->getGeneralizedCoordinateDim(); i++)
+    {
+        trajectoryGenerator[i].updateTrajectory(currentPosition[i],goalPosition[i],setTime.localtime,timeDuration)  ;
+    } ///calculate the Coefficient for cubic
+
+    while (1)
+    {
+        setTime.setLocaltime(); //get in while loop. time step increasing
+        for (int jointNum = 0; jointNum < robot->getGeneralizedCoordinateDim() ; jointNum++)
+        {
+            jointPositionTarget[jointNum] = trajectoryGenerator[jointNum].getPositionTrajectory(setTime.localtime);
+            jointVelocityTarget[jointNum] = trajectoryGenerator[jointNum].getVelocityTrajectory(setTime.localtime);
+        }
+
+        /// robot set position
+        robot->setGeneralizedCoordinate(jointPositionTarget);
+        robot->setGeneralizedForce(Force);
+        world->integrate();
+        usleep(5000);
+        if (setTime.localtime >= timeDuration)
+            break;
+    }
+
+    robot->setPdGains(mPgain, mDgain);
+    robot->setPdTarget(jointPositionTarget, jointVelocityTarget);
+//    Force.setZero();
+//    robot->setGeneralizedForce(Force);
+
+//    for(int i=0; i<6; i++){
+//        std::cout << JointSpaceInput[i] << " ";
+//    }
+    std::cout << std::endl;
+//    std::cout << "world time check : " << world->getWorldTime() << std::endl;
+
+    std::cout << "\n" <<  "robot current position  :  " << robot->getGeneralizedCoordinate() << std::endl;
+}
+
+
 
 

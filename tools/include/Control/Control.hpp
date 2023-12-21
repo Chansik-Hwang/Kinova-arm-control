@@ -12,6 +12,8 @@
 #include <vector>
 #include "raisim/World.hpp"
 #include "raisim/RaisimServer.hpp"
+#include "Others/setTime.hpp"
+#include "Planning/cubicTrajectoryGenerator.hpp"
 class control{
 
 private:
@@ -25,21 +27,27 @@ private:
     Eigen::MatrixXd J;
     Eigen::MatrixXd Inv_J;
 
-    Eigen::Matrix3d rotate(double r, double p, double y);
+    Eigen::VectorXd mPgain;
+    Eigen::VectorXd mDgain;
 
+    int LoopCount;
+
+
+    Eigen::Matrix3d rotate(double r, double p, double y);
     void changeR2T(Eigen::Matrix3d R01,Eigen::Matrix3d R12,Eigen::Matrix3d R23,
                    Eigen::Matrix3d R34,Eigen::Matrix3d R45,Eigen::Matrix3d R56, Eigen::Matrix3d R67);
     void getOrientation(Eigen::MatrixXd Tmatrix, Eigen::VectorXd &FKValue);
     void getJacobian(Eigen::VectorXd &th);
 
 public:
-    control() : Jacobian_v(3, 6),Jacobian_w(3, 6),J(6, 6), Inv_J(6,6),testJ(6,6){
+    control() : Jacobian_v(3, 6),Jacobian_w(3, 6),J(6, 6), Inv_J(6,6),testJ(6,6),
+                mPgain(6),mDgain(6){
 
     }
 
-
+    void JointPDControl(Eigen::VectorXd Joints, raisim::World* world, raisim::ArticulatedSystem *robot, float timeDuration);
     Eigen::VectorXd ComputeFK(Eigen::VectorXd &inputjoints);
-    void ComputeIK(Eigen::VectorXd &initial_angle, Eigen::VectorXd goal_pose,raisim::ArticulatedSystem *robot);
+    Eigen::VectorXd ComputeIK(Eigen::VectorXd &initial_angle, Eigen::VectorXd goal_pose,raisim::ArticulatedSystem *robot);
 
     Eigen::MatrixXd testJ;
 
