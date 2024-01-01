@@ -31,7 +31,7 @@
     <visual>
       <origin rpy="1.57 0 0" xyz="0 0 0"/>
       <geometry>
-           <mesh filename="../meshes/cup.stl" scale="0.001 0.001 0.001"/>
+        <sphere radius="0.06"/>
       </geometry>
       <material name="pink">
       <color rgba="1 0.76862745098 1 1"/>
@@ -40,7 +40,7 @@
 
     <collision>
       <geometry>
-	 	 <mesh filename="../meshes/cup.obj" scale="0.001 0.001 0.001"/>
+        <sphere radius="0.06"/>
       </geometry>
       <origin rpy="1.57 0 0" xyz="0 0 0"/>
     </collision>
